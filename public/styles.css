@@ -1,5 +1,21 @@
-#cy {
-    width: 800px;
+#viewer-cy, #editor-cy {
+    width: 100%;
     height: 600px;
     border: 1px solid #ccc;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-menu {
+    margin-bottom: 10px;
+}
+
+#palette {
+    margin-bottom: 10px;
 }
