@@ -1,31 +1,85 @@
-import { PetriNet } from './petriNetModel.js';
+import sax from 'sax';
+import { PetriNet } from './petriNetModel';
 
-function loadPetriNet() {
-    const petriNet = new PetriNet();
-
-    // Example Petri net
-    const place = ['A1', 'B1', 'A2', 'B2'];
-    const trans = ['t1', 't2'];
-    const pre = [[{ p: 0, w: 1 }, { p: 2, w: 1 }], [{ p: 0, w: 1 }, { p: 2, w: 1 }]];
-    const post = [[{ p: 1, w: 1 }, { p: 2, w: 1 }], [{ p: 0, w: 1 }, { p: 3, w: 1 }]];
-    const m0 = [1, 0, 1, 0];
-
-    place.forEach((p, index) => petriNet.addPlace(`p${index}`, p, m0[index]));
-    trans.forEach((t, index) => petriNet.addTransition(`t${index}`, t));
-
-    pre.forEach((arcs, tIndex) => {
-        arcs.forEach(arc => {
-            petriNet.addArc(`p${arc.p}`, `t${tIndex}`, arc.w);
-        });
-    });
-
-    post.forEach((arcs, tIndex) => {
-        arcs.forEach(arc => {
-            petriNet.addArc(`t${tIndex}`, `p${arc.p}`, arc.w);
-        });
-    });
-
+export function loadPetriNet(content) {
+    const parser = new PNMLParser();
+    const petriNet = parser.parse(content);
     return petriNet;
 }
 
-export { loadPetriNet };
+class PNMLParser {
+    constructor() {
+        this.parser = sax.parser(true);
+        this.net = new PetriNet();
+        this.stack = [];
+        this.index = {};
+        this.inToolspecific = false;
+
+        this.parser.onopentag = this.startElement.bind(this);
+        this.parser.onclosetag = this.endElement.bind(this);
+        this.parser.ontext = this.charData.bind(this);
+    }
+
+    parse(content) {
+        this.parser.write(content).close();
+        return this.net;
+    }
+
+    startElement(node) {
+        if (this.inToolspecific) {
+            return;
+        }
+
+        if (node.name === "net") {
+            this.stack.push(this.net);
+        } else if (node.name === "place") {
+            const id = node.attributes.id;
+            this.index[id] = { id, tokens: 0 };
+            this.stack.push(this.index[id]);
+        } else if (node.name === "transition") {
+            const id = node.attributes.id;
+            this.index[id] = { id };
+            this.stack.push(this.index[id]);
+        } else if (node.name === "arc") {
+            const source = node.attributes.source;
+            const target = node.attributes.target;
+            this.net.addArc(source, target, 1);
+        } else if (node.name === "initialMarking") {
+            this.currentElement = "initialMarking";
+        } else if (node.name === "toolspecific") {
+            this.inToolspecific = true;
+        }
+    }
+
+    endElement(name) {
+        if (name === "toolspecific") {
+            this.inToolspecific = false;
+            return;
+        }
+
+        if (this.inToolspecific) {
+            return;
+        }
+
+        if (name === "place") {
+            const place = this.stack.pop();
+            this.net.addPlace(place.id, place.id, place.tokens);
+        } else if (name === "transition") {
+            const transition = this.stack.pop();
+            this.net.addTransition(transition.id, transition.id);
+        } else if (name === "initialMarking") {
+            this.currentElement = null;
+        }
+    }
+
+    charData(text) {
+        if (this.inToolspecific) {
+            return;
+        }
+
+        if (this.currentElement === "initialMarking") {
+            const currentItem = this.stack[this.stack.length - 1];
+            currentItem.tokens = parseInt(text.trim(), 10);
+        }
+    }
+}
