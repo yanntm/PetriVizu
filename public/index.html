@@ -3,15 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Petri Net Visualization</title>
+    <title>Petri Net Application</title>
     <script type="module" src="js/bundle.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="menu">
-        <button id="fileOpen">File -> Open</button>
-        <input type="file" id="fileInput" accept=".pnml" style="display: none;">
+    <div class="tab-menu">
+        <button class="tab-button" onclick="openTab('viewer')">Viewer</button>
+        <button class="tab-button" onclick="openTab('editor')">Editor</button>
     </div>
-    <div id="cy"></div>
+    <div id="viewer" class="tab-content" style="display: block;">
+        <div id="viewer-menu">
+            <button id="fileOpen">File -> Open</button>
+            <input type="file" id="fileInput" accept=".pnml" style="display: none;">
+        </div>
+        <div id="viewer-cy"></div>
+    </div>
+    <div id="editor" class="tab-content" style="display:none;">
+        <div id="palette">
+            <button id="addPlace" title="Add Place">🔵</button>
+            <button id="addTransition" title="Add Transition">⬛</button>
+            <button id="addArc" title="Add Arc">➡️</button>
+            <button id="editText" title="Edit Text">abc...</button>
+        </div>
+        <div id="editor-cy"></div>
+    </div>
+    <script>
+        function openTab(tabName) {
+            const tabs = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].style.display = 'none';
+            }
+            document.getElementById(tabName).style.display = 'block';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Ensure the viewer tab is visible by default
+            openTab('viewer');
+        });
+    </script>
 </body>
 </html>
