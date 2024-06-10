@@ -16,7 +16,7 @@ jobs:
       with:
         node-version: '14'
     - name: Build project
-      run: ./build.sh
+      run: npm install && npm run build
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@v4.5.0
       with:
