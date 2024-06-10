@@ -1,0 +1,24 @@
+{
+  "name": "petri-net-visualization",
+  "version": "1.0.0",
+  "description": "A Petri Net visualization tool using Cytoscape.js",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "webpack serve --open",
+    "build": "npm run clean && npm run copy && webpack",
+    "clean": "rm -rf website",
+    "copy": "mkdir -p website && cp -r public/* website/"
+  },
+  "author": "Yann Thierry-Mieg",
+  "license": "GPL-3.0-only",
+  "dependencies": {
+    "cytoscape": "^3.29.2",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.4",
+    "babel-loader": "^9.1.3"
+  }
+}
