@@ -1,6 +1,6 @@
 import cytoscape from 'cytoscape';
 import cytoscapeStyles from './cytoscapeStyles.js';
-import { updateLabelPositions, updateCytoscapeCommon } from './cytoscapeUtils.js';
+import { updateCytoscapeCommon } from './cytoscapeUtils.js';
 
 function initCytoscape(petriNet, containerId) {
     const cy = cytoscape({
@@ -15,7 +15,7 @@ function initCytoscape(petriNet, containerId) {
 function updateCytoscape(cy, petriNet) {
     updateCytoscapeCommon(cy, petriNet);
 
-    cy.layout({ name: 'cose', padding: 10 }).run().promiseOn('layoutstop').then(() => {        
+    cy.layout({ name: 'cose', padding: 10 }).run().promiseOn('layoutstop').then(() => {
         cy.fit();
     });
 }

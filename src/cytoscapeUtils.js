@@ -2,35 +2,35 @@ function createCytoscapeElements(petriNet, options = {}) {
     const elements = [];
     const { showAllLabels = false } = options;
 
-    petriNet.places.forEach((place) => {
-        const label = showAllLabels || place.tokens > 0 ? `${place.name}\n${place.tokens}` : place.name;
+    petriNet.places.forEach((index, id) => {
+        const label = showAllLabels || petriNet.initialState[index] > 0 ? `${id}\n${petriNet.initialState[index]}` : id;
 
         elements.push({
             data: {
-                id: place.id,
+                id: id,
                 label: label
             },
             classes: 'place'
         });
     });
 
-    petriNet.transitions.forEach((transition) => {
+    petriNet.transitions.forEach((index, id) => {
         elements.push({
             data: {
-                id: transition.id,
-                label: transition.name
+                id: id,
+                label: id
             },
             classes: 'transition'
         });
     });
 
-    petriNet.arcs.forEach((arc) => {
+    petriNet.getArcs().forEach(([sourceId, targetId, weight]) => {
         elements.push({
             data: {
-                id: `${arc.source}-${arc.target}`,
-                source: arc.source,
-                target: arc.target,
-                weight: showAllLabels || arc.weight > 1 ? arc.weight : '' // Only show weight if showAllLabels is true or greater than 1
+                id: `${sourceId}-${targetId}`,
+                source: sourceId,
+                target: targetId,
+                weight: showAllLabels || weight > 1 ? weight : '' // Only show weight if showAllLabels is true or greater than 1
             }
         });
     });

@@ -1,4 +1,4 @@
-import { PetriNet } from './petriNetModel';
+import { PetriNet } from './petriNetModel.js';
 
 export function buildExample() {
     const exampleNet = new PetriNet();
