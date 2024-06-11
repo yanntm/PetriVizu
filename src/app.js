@@ -1,5 +1,5 @@
 import { loadPetriNet } from './loader.js';
-import { initCytoscape, updateCytoscape } from './cytoscapeIntegration.js';
+import { initCytoscape, updateCytoscape } from './viewMode.js';
 import { buildExample } from './example.js';
 import { enterEditMode } from './editMode.js';
 
