@@ -63,7 +63,7 @@ class PNMLParser {
 
         if (name === "place") {
             const place = this.stack.pop();
-            this.net.addPlace(place.id, place.id, place.tokens);
+            this.net.addPlace(place.id, place.id, place.tokens !== undefined && place.tokens !== null ? place.tokens : 0);
         } else if (name === "transition") {
             const transition = this.stack.pop();
             this.net.addTransition(transition.id, transition.id);
@@ -79,7 +79,16 @@ class PNMLParser {
 
         if (this.currentElement === "initialMarking") {
             const currentItem = this.stack[this.stack.length - 1];
-            currentItem.tokens = parseInt(text.trim(), 10);
+            const trimmedText = text.trim();
+            if (trimmedText !== '') {
+                const tokens = parseInt(trimmedText, 10);
+                if (!isNaN(tokens)) {
+                    currentItem.tokens = tokens;
+                    // console.log("Initial marking: ", currentItem.tokens, " from text : ", trimmedText);
+                } else {
+                    // console.log("Ignored invalid number: ", trimmedText);
+                }
+            }
         }
     }
 }
