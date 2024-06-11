@@ -1,10 +1,15 @@
+import cytoscape from 'cytoscape';
+import edgehandles from 'cytoscape-edgehandles';
 import { PetriNet } from './petriNetModel';
-import { initCytoscape } from './cytoscapeIntegration.js';
-import { updateCytoscapeCommon, updateLabelPositions } from './cytoscapeUtils.js';
+import { initCytoscape } from './viewMode.js';
+import { updateCytoscapeCommon } from './cytoscapeUtils.js';
+
+cytoscape.use(edgehandles);
 
 let cy;
 let petriNet;
 let currentTool = null;
+let eh; // Edgehandles instance
 
 function enterEditMode(existingNet) {
     petriNet = existingNet || new PetriNet();
@@ -13,6 +18,46 @@ function enterEditMode(existingNet) {
     cy = initCytoscape(petriNet, 'editor-cy');
     updateCytoscape(cy, petriNet, true); // Pass true to indicate edit mode
 
+    // Initialize edge handles with bipartite constraint
+    eh = cy.edgehandles({
+        toggleOffOnLeave: true,
+        handleNodes: "node",
+        handleSize: 10,
+        edgeType: function() {
+            return 'flat';
+        },
+        complete: function(sourceNode, targetNode, addedEdge) {
+            console.log('Edge added:', sourceNode, targetNode, addedEdge);
+            const arcId = `${sourceNode.id()}-${targetNode.id()}`;
+            petriNet.addArc(sourceNode.id(), targetNode.id(), 1);
+            cy.add([
+                {
+                    group: 'edges',
+                    data: { id: arcId, source: sourceNode.id(), target: targetNode.id(), weight: 1 }
+                }
+            ]);
+        },
+        canConnect: function(sourceNode, targetNode) {
+            // Enforce bipartite constraint
+            const sourceIsPlace = sourceNode.hasClass('place');
+            const targetIsPlace = targetNode.hasClass('place');
+            const sourceIsTransition = sourceNode.hasClass('transition');
+            const targetIsTransition = targetNode.hasClass('transition');
+
+            return (sourceIsPlace && targetIsTransition) || (sourceIsTransition && targetIsPlace);
+        },
+        edgeParams: function(sourceNode, targetNode) {
+            // Return element object to be passed to cy.add() for edge
+            return {};
+        },
+        hoverDelay: 150,
+        snap: true,
+        snapThreshold: 50,
+        snapFrequency: 15,
+        noEdgeEventsInDraw: true,
+        disableBrowserGestures: true
+    });
+
     // Show the palette for adding elements
     document.getElementById('palette').style.display = 'block';
 
@@ -20,36 +65,26 @@ function enterEditMode(existingNet) {
     cy.on('tap', 'node, edge', function(event) {
         if (currentTool === 'editText') {
             const target = event.target;
-            const newName = prompt("Enter new value:", target.data('name'));
+            const labelParts = target.data('label').split('\n');
+            const name = labelParts[0];
+            const marking = labelParts[1] || '';
+            const newName = prompt("Enter new name:", name);
+            const newMarking = target.hasClass('place') ? prompt("Enter new marking:", marking) : marking;
             if (newName !== null) {
-                target.data('name', newName);
-                updateLabelPositions(cy); // Update label positions after renaming
+                const newLabel = target.hasClass('place') ? `${newName}\n${newMarking}` : newName;
+                target.data('label', newLabel);
             }
         }
     });
-	
-	// Handle canvas clicks
-	cy.on('tap', function(event) {
-	    if (event.target === cy) { // Check if the target is the background
-	        const pos = event.position;
-	        if (currentTool === 'place') {
-	            addPlace(pos);
-	        } else if (currentTool === 'transition') {
-	            addTransition(pos);
-	        }
-	    }
-	});
 
-
-    // Handle arc creation
-    let sourceNode = null;
-    cy.on('tap', 'node', function(event) {
-        if (currentTool === 'arc') {
-            if (!sourceNode) {
-                sourceNode = event.target;
-            } else {
-                addArc(sourceNode.id(), event.target.id());
-                sourceNode = null;
+    // Handle canvas clicks
+    cy.on('tap', function(event) {
+        if (event.target === cy) { // Check if the target is the background
+            const pos = event.position;
+            if (currentTool === 'place') {
+                addPlace(pos);
+            } else if (currentTool === 'transition') {
+                addTransition(pos);
             }
         }
     });
@@ -62,6 +97,12 @@ function selectTool(tool) {
     document.querySelectorAll('#palette button').forEach(button => {
         button.style.backgroundColor = button.id === `add${capitalizeFirstLetter(tool)}` ? 'lightgray' : '';
     });
+
+    if (tool === 'arc') {
+        eh.enableDrawMode();
+    } else {
+        eh.disableDrawMode();
+    }
 }
 
 function capitalizeFirstLetter(string) {
@@ -76,15 +117,9 @@ function addPlace(position) {
     cy.add([
         {
             group: 'nodes',
-            data: { id: placeId, marking: 0 },
+            data: { id: placeId, label: `${placeId}\n0` }, // Combined label with name and marking
             position: position,
             classes: 'place'
-        },
-        {
-            group: 'nodes',
-            data: { id: `${placeId}_name`, parent: `parent_${placeId}`, name: placeId },
-            position: { x: position.x, y: position.y - 25 },
-            classes: 'node-name'
         }
     ]);
 }
@@ -97,15 +132,9 @@ function addTransition(position) {
     cy.add([
         {
             group: 'nodes',
-            data: { id: transitionId },
+            data: { id: transitionId, label: transitionId }, // Single label with name
             position: position,
             classes: 'transition'
-        },
-        {
-            group: 'nodes',
-            data: { id: `${transitionId}_name`, parent: `parent_${transitionId}`, name: transitionId },
-            position: { x: position.x, y: position.y - 25 },
-            classes: 'node-name'
         }
     ]);
 }
@@ -135,7 +164,6 @@ function addArc(sourceId, targetId) {
 
 function updateCytoscape(cy, petriNet, editMode = false) {
     updateCytoscapeCommon(cy, petriNet, editMode);
-    updateLabelPositions(cy);
 }
 
 export { enterEditMode, selectTool, addPlace, addTransition, addArc };

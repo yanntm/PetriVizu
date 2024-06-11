@@ -15,8 +15,7 @@ function initCytoscape(petriNet, containerId) {
 function updateCytoscape(cy, petriNet) {
     updateCytoscapeCommon(cy, petriNet);
 
-    cy.layout({ name: 'cose', padding: 10 }).run().promiseOn('layoutstop').then(() => {
-        updateLabelPositions(cy);
+    cy.layout({ name: 'cose', padding: 10 }).run().promiseOn('layoutstop').then(() => {        
         cy.fit();
     });
 }
