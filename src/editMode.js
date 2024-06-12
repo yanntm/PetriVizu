@@ -28,18 +28,7 @@ function enterEditMode(existingNet) {
         handleSize: 10,
         edgeType: function() {
             return 'flat';
-        },
-        complete: function(sourceNode, targetNode, addedEdge) {
-        //    console.log('Edge added:', sourceNode.id(), targetNode.id(), addedEdge.id());
-            const arcId = `${sourceNode.id()}-${targetNode.id()}`;
-            petriNet.addArc(sourceNode.id(), targetNode.id(), 1);
-            cy.add([
-                {
-                    group: 'edges',
-                    data: { id: arcId, source: sourceNode.id(), target: targetNode.id(), weight: '1' }
-                }
-            ]);
-        },
+        }, 
         canConnect: function(sourceNode, targetNode) {
             // Enforce bipartite constraint
             const sourceIsPlace = sourceNode.hasClass('place');
@@ -51,12 +40,9 @@ function enterEditMode(existingNet) {
         },
         edgeParams: function(sourceNode, targetNode) {
             // Return element object to be passed to cy.add() for edge
-            return {
-                group: 'edges',
-                data: {
-                    source: sourceNode.id(),
-                    target: targetNode.id(),
-                    weight: '1' // Set the default weight
+            return {                
+                data: {                    
+                    label: '1' // Set the default weight
                 }
             };
         },
@@ -67,6 +53,13 @@ function enterEditMode(existingNet) {
         noEdgeEventsInDraw: true,
         disableBrowserGestures: true
     });
+    
+    cy.on('ehcomplete', (event, sourceNode, targetNode, addedEdge) => {
+		console.log('Edge added:', sourceNode.id(), targetNode.id(), addedEdge.id());        
+        addArc(sourceNode.id(), targetNode.id(), 1);
+	});
+    
+    
 
     // Show the palette for adding elements
     document.getElementById('palette').style.display = 'block';
@@ -82,30 +75,41 @@ function enterEditMode(existingNet) {
     selectTool('selectMove');
 
     // Make text labels editable with the editText tool
-	cy.on('tap', 'node, edge', function(event) {
-	    if (currentTool === 'editText') {
-	        const target = event.target;
-	        console.log('Edit Text Tool - Target:', target.data());
-	
-	        if (target.isEdge()) {
-	            const currentWeight = target.data('weight') || '1'; // Default to '1' if weight is not set
-	            const newWeight = prompt("Enter new weight:", currentWeight);
-	            if (newWeight !== null) {
-	                target.data('weight', newWeight); // Update weight data
-	            }
-	        } else {
-	            const labelParts = target.data('label').split('\n');
-	            const name = labelParts[0];
-	            const marking = labelParts[1] || '';
-	            const newName = prompt("Enter new name:", name);
-	            const newMarking = target.hasClass('place') ? prompt("Enter new marking:", marking) : marking;
-	            if (newName !== null) {
-	                const newLabel = target.hasClass('place') ? `${newName}\n${newMarking}` : newName;
-	                target.data('label', newLabel);
-	            }
-	        }
-	    }
-	});
+	// Make text labels editable with the editText tool
+    cy.on('tap', 'node, edge', function(event) {
+        if (currentTool === 'editText') {
+            const target = event.target;
+            console.log('Edit Text Tool - Target:', target.data());
+
+            if (target.isEdge()) {
+                const currentLabel = target.data('label') || '1'; // Default to '1' if label is not set
+                const newLabel = prompt("Enter new weight:", currentLabel);
+                if (newLabel !== null) {
+                    const sourceNode = cy.getElementById(target.data('source'));
+                    const targetNode = cy.getElementById(target.data('target'));
+                    const sourceLabel = sourceNode.data('label').split('\n')[0];
+                    const targetLabel = targetNode.data('label').split('\n')[0];
+                    petriNet.updateWeight(sourceLabel, targetLabel, parseInt(newLabel));
+                    target.data('label', newLabel); // Update Cytoscape edge label
+                }            
+           } else {
+                const labelParts = target.data('label').split('\n');
+                const name = labelParts[0];
+                const marking = labelParts[1] || '';
+                const newName = prompt("Enter new name:", name);
+                const newMarking = target.hasClass('place') ? prompt("Enter new marking:", marking) : marking;
+                if (newName !== null) {
+                    if (target.hasClass('place')) {
+                        petriNet.renamePlace(name, newName);
+                        target.data('label', `${newName}\n${newMarking}`);
+                    } else if (target.hasClass('transition')) {
+                        petriNet.renameTransition(name, newName);
+                        target.data('label', newName);
+                    }
+                }
+            }
+        }
+    });
 
 
     // Handle canvas clicks
@@ -189,21 +193,9 @@ function addArc(sourceId, targetId) {
         return;
     }
 
-    const arcId = `${sourceId}-${targetId}`;
     petriNet.addArc(sourceId, targetId, 1);
 
-    const edgeData = { id: arcId, source: sourceId, target: targetId, weight: '1' };
-    console.log('Adding edge with data:', edgeData);
-
-    // Add arc to Cytoscape
-    cy.add([
-        {
-            group: 'edges',
-            data: edgeData
-        }
-    ]);
-
-    console.log('Added Arc - Source ID:', sourceId, 'Target ID:', targetId, 'Data:', edgeData);
+    console.log('Added Arc - Source ID:', sourceId, 'Target ID:', targetId);
 }
 
 
