@@ -35,7 +35,41 @@ class PetriNet {
         } else {
             throw new Error("Invalid arc: source and target must be either a place and a transition or vice versa.");
         }
+        console.log('Arc added:', source, target, weight);
+
     }
+    
+        renamePlace(oldId, newId) {
+        if (!this.places.has(oldId)) throw new Error(`Place ${oldId} does not exist.`);
+        const index = this.places.get(oldId);
+        this.places.delete(oldId);
+        this.places.set(newId, index);
+        this.reversePlaces[index] = newId;
+    }
+
+    renameTransition(oldId, newId) {
+        if (!this.transitions.has(oldId)) throw new Error(`Transition ${oldId} does not exist.`);
+        const index = this.transitions.get(oldId);
+        this.transitions.delete(oldId);
+        this.transitions.set(newId, index);
+        this.reverseTransitions[index] = newId;
+    }
+
+    updateWeight(source, target, newWeight) {
+        const sourceIndex = this.places.has(source) ? this.places.get(source) : this.transitions.get(source);
+        const targetIndex = this.places.has(target) ? this.places.get(target) : this.transitions.get(target);
+
+        if (this.transitions.has(source)) {
+            const arc = this.post[sourceIndex].find(([idx]) => idx === targetIndex);
+            if (arc) arc[1] = newWeight;
+        } else if (this.transitions.has(target)) {
+            const arc = this.pre[targetIndex].find(([idx]) => idx === sourceIndex);
+            if (arc) arc[1] = newWeight;
+        } else {
+            throw new Error("Invalid arc: source and target must be either a place and a transition or vice versa.");
+        }
+    }
+    
 
     isEnabled(state, transitionId) {
         const transitionIndex = this.transitions.get(transitionId);
