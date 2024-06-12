@@ -70,6 +70,7 @@ function enterEditMode(existingNet) {
     document.getElementById('addTransition').addEventListener('click', () => selectTool('transition'));
     document.getElementById('addArc').addEventListener('click', () => selectTool('arc'));
     document.getElementById('editText').addEventListener('click', () => selectTool('editText'));
+	document.getElementById('delete').addEventListener('click', () => selectTool('delete'));
 
     // Set the default tool to 'selectMove' and highlight it
     selectTool('selectMove');
@@ -107,6 +108,25 @@ function enterEditMode(existingNet) {
                         target.data('label', newName);
                     }
                 }
+            }
+        } else if (currentTool === 'delete') {
+            const target = event.target;
+            if (target.isEdge()) {
+                const sourceNode = cy.getElementById(target.data('source'));
+                const targetNode = cy.getElementById(target.data('target'));
+                const sourceLabel = sourceNode.data('label').split('\n')[0];
+                const targetLabel = targetNode.data('label').split('\n')[0];
+                petriNet.deleteArc(sourceLabel, targetLabel);
+                target.remove();
+            } else {
+                const labelParts = target.data('label').split('\n');
+                const name = labelParts[0];
+                if (target.hasClass('place')) {
+                    petriNet.deletePlace(name);
+                } else if (target.hasClass('transition')) {
+                    petriNet.deleteTransition(name);
+                }
+                target.remove();
             }
         }
     });

@@ -39,7 +39,7 @@ class PetriNet {
 
     }
     
-        renamePlace(oldId, newId) {
+    renamePlace(oldId, newId) {
         if (!this.places.has(oldId)) throw new Error(`Place ${oldId} does not exist.`);
         const index = this.places.get(oldId);
         this.places.delete(oldId);
@@ -70,6 +70,47 @@ class PetriNet {
         }
     }
     
+        deleteArc(source, target) {
+        const sourceIndex = this.places.has(source) ? this.places.get(source) : this.transitions.get(source);
+        const targetIndex = this.places.has(target) ? this.places.get(target) : this.transitions.get(target);
+
+        if (this.transitions.has(source)) {
+            this.post[sourceIndex] = this.post[sourceIndex].filter(([idx]) => idx !== targetIndex);
+        } else if (this.transitions.has(target)) {
+            this.pre[targetIndex] = this.pre[targetIndex].filter(([idx]) => idx !== sourceIndex);
+        } else {
+            throw new Error("Invalid arc: source and target must be either a place and a transition or vice versa.");
+        }
+    }
+
+    deletePlace(id) {
+        if (!this.places.has(id)) throw new Error(`Place ${id} does not exist.`);
+        const index = this.places.get(id);
+        this.places.delete(id);
+        this.reversePlaces.splice(index, 1);
+        this.initialState.splice(index, 1);
+
+        // Update arcs
+        this.pre = this.pre.map(arcs => arcs.filter(([idx]) => idx !== index).map(([idx, weight]) => [idx > index ? idx - 1 : idx, weight]));
+        this.post = this.post.map(arcs => arcs.filter(([idx]) => idx !== index).map(([idx, weight]) => [idx > index ? idx - 1 : idx, weight]));
+
+        // Update indexes
+        this.places.forEach((value, key) => {
+            if (value > index) {
+                this.places.set(key, value - 1);
+            }
+        });
+    }
+    
+    deleteTransition(id) {
+	    if (!this.transitions.has(id)) throw new Error(`Transition ${id} does not exist.`);
+	    const index = this.transitions.get(id);
+	    this.transitions.delete(id);
+	    this.reverseTransitions.splice(index, 1);
+	    this.pre.splice(index, 1);
+	    this.post.splice(index, 1);
+	}
+
 
     isEnabled(state, transitionId) {
         const transitionIndex = this.transitions.get(transitionId);
