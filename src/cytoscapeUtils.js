@@ -30,7 +30,7 @@ function createCytoscapeElements(petriNet, options = {}) {
                 id: `${sourceId}-${targetId}`,
                 source: sourceId,
                 target: targetId,
-                weight: showAllLabels || weight > 1 ? weight : '' // Only show weight if showAllLabels is true or greater than 1
+                label: showAllLabels || weight > 1 ? `${weight}` : '' // Only show weight if showAllLabels is true or greater than 1
             }
         });
     });
