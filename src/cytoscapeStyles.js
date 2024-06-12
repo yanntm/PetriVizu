@@ -37,9 +37,14 @@ const cytoscapeStyles = [
             'target-arrow-color': 'black',
             'target-arrow-shape': 'triangle',
             'curve-style': 'bezier',
-            'label': 'data(weight)',
             'font-size': '10px',
             'color': 'black'
+        }
+    },
+    {
+        selector: 'edge[label]',
+        style: {
+            'label': 'data(label)', // Apply label style only if label is present
         }
     }
 ];
