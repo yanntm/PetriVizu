@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateCytoscape(viewerCy, petriNet);
                 // Update editor too if already initialized
                 if (editorCy) {
-                    enterEditMode(petriNet);
+                    updateCytoscape(editorCy, petriNet);
                 }
             };
             reader.readAsText(file);
@@ -37,8 +37,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize Editor tab
     document.querySelector('.tab-button[onclick="openTab(\'editor\')"]').addEventListener('click', () => {
         if (!editorCy) {
-            enterEditMode(petriNet);
+            editorCy = enterEditMode(petriNet);
+        } else {
+            updateCytoscape(editorCy, petriNet);
         }
+    });
+
+    // Handle tab switching
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const tabName = event.target.getAttribute('onclick').match(/openTab\('([^']+)'\)/)[1];
+            openTab(tabName);
+        });
     });
 });
 
@@ -49,7 +59,13 @@ function openTab(tabName) {
     }
     document.getElementById(tabName).style.display = 'block';
 
-    if (tabName === 'editor' && !editorCy) {
-        enterEditMode(petriNet);
+    if (tabName === 'editor') {
+        if (!editorCy) {
+            editorCy = enterEditMode(petriNet);
+        } else {
+            updateCytoscape(editorCy, petriNet);
+        }
+    } else if (tabName === 'viewer') {
+        updateCytoscape(viewerCy, petriNet);
     }
 }
