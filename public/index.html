@@ -11,6 +11,7 @@
     <div class="tab-menu">
         <button class="tab-button" onclick="openTab('viewer')">Viewer</button>
         <button class="tab-button" onclick="openTab('editor')">Editor</button>
+        <button class="tab-button" onclick="openTab('simulation')">Simulation</button>
     </div>
     <div id="viewer" class="tab-content" style="display: block;">
         <div id="viewer-menu">
@@ -26,9 +27,15 @@
             <button id="addTransition" title="Add Transition">⬛</button>
             <button id="addArc" title="Add Arc">➡️</button>
             <button id="editText" title="Edit Text">abc...</button>
-			<button id="delete" title="Delete Tool">❌</button>
+            <button id="delete" title="Delete Tool">❌</button>
         </div>
         <div id="editor-cy"></div>
+    </div>
+    <div id="simulation" class="tab-content" style="display:none;">
+        <div id="simulation-menu">
+            <button id="reset" title="Reset Simulation">🔄</button>
+        </div>
+        <div id="simulation-cy"></div>
     </div>
     <script>
         function openTab(tabName) {

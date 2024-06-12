@@ -2,9 +2,11 @@ import { loadPetriNet } from './loader.js';
 import { initCytoscape, updateCytoscape } from './viewMode.js';
 import { buildExample } from './example.js';
 import { enterEditMode } from './editMode.js';
+import { enterSimulationMode } from './simulationMode.js';
 
 let viewerCy;
 let editorCy;
+let simulationCy;
 let petriNet;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -29,6 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (editorCy) {
                     updateCytoscape(editorCy, petriNet);
                 }
+                // Update simulation too if already initialized
+                if (simulationCy) {
+                    enterSimulationMode(petriNet); // Re-enter simulation mode to reset state
+                }
             };
             reader.readAsText(file);
         }
@@ -40,6 +46,16 @@ document.addEventListener('DOMContentLoaded', () => {
             editorCy = enterEditMode(petriNet);
         } else {
             updateCytoscape(editorCy, petriNet);
+        }
+    });
+
+    // Initialize Simulation tab
+    document.querySelector('.tab-button[onclick="openTab(\'simulation\')"]').addEventListener('click', () => {
+        if (!simulationCy) {
+            simulationCy = initCytoscape(petriNet, 'simulation-cy');
+            enterSimulationMode(petriNet);
+        } else {
+            updateCytoscape(simulationCy, petriNet);
         }
     });
 
@@ -67,5 +83,12 @@ function openTab(tabName) {
         }
     } else if (tabName === 'viewer') {
         updateCytoscape(viewerCy, petriNet);
+    } else if (tabName === 'simulation') {
+        if (!simulationCy) {
+            simulationCy = initCytoscape(petriNet, 'simulation-cy');
+            enterSimulationMode(petriNet);
+        } else {
+            updateCytoscape(simulationCy, petriNet);
+        }
     }
 }
