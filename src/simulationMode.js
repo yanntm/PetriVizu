@@ -55,9 +55,6 @@ function updateCytoShownState(cy, petriNet, state) {
             node.data('label', `${name}\n${marking}`);
         }
     });
-    cy.layout({ name: 'cose', padding: 10 }).run().promiseOn('layoutstop').then(() => {
-        cy.fit();
-    });
 }
 
 function updateEnabled(state, petriNet) {
