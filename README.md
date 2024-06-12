@@ -1,8 +1,16 @@
 ## Petri Net Visualization
 
-A Petri Net visualization tool using Cytoscape.js.
+A Petri net visualization and simulation tool in your browser.
+
+Available here : https://yanntm.github.io/PetriVizu
+
+Features currently include loading nets from PNML, visualizing them with some layout helpers, editing nets. 
+
+Export and simulation mode forthcoming.
 
 ### Building the Project
+
+This project is in JS, and relies on cytoscape graph library.
 
 To build the project from the git repository:
 
