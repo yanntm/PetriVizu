@@ -1,11 +1,13 @@
 import cytoscape from 'cytoscape';
 import cytoscapeStyles from './cytoscapeStyles.js';
 import { createCytoscapeElements } from './cytoscapeUtils.js';
+import Trace from './trace.js';
 
 let simulationCy;
 let currentState;
 let currentEnabled = [];
 let petriNet;
+let trace = new Trace();
 
 function enterSimulationMode(existingNet) {
     petriNet = existingNet || new PetriNet();
@@ -14,13 +16,13 @@ function enterSimulationMode(existingNet) {
     simulationCy = initCytoscape(petriNet, 'simulation-cy');
     updateCytoShownState(simulationCy, petriNet, currentState);
     updateEnabled(currentState, petriNet);
+    updateCurrentStateDisplay(currentState, petriNet);
+    updateTraceDisplay();
 
     simulationCy.on('tap', 'node.transition', function(event) {
         const transitionId = event.target.id();
         if (currentEnabled.includes(transitionId)) {
-            currentState = petriNet.fireTransition(currentState, transitionId);
-            updateCytoShownState(simulationCy, petriNet, currentState);
-            updateEnabled(currentState, petriNet);
+            fireTransition(transitionId);
         }
     });
 
@@ -59,6 +61,20 @@ function updateCytoShownState(cy, petriNet, state) {
 
 function updateEnabled(state, petriNet) {
     currentEnabled = petriNet.getEnabledTransitions(state);
+    const enabledTransitionsDiv = document.getElementById('enabled-transitions');
+    enabledTransitionsDiv.innerHTML = "";
+
+    currentEnabled.forEach(transitionId => {
+        const transitionName = transitionId;
+        const transitionItem = document.createElement('div');
+        transitionItem.innerText = transitionName;
+        transitionItem.style.cursor = 'pointer';
+        transitionItem.addEventListener('click', () => {
+            fireTransition(transitionId);
+        });
+        enabledTransitionsDiv.appendChild(transitionItem);
+    });
+
     simulationCy.nodes().forEach(node => {
         if (node.hasClass('transition')) {
             if (currentEnabled.includes(node.id())) {
@@ -70,10 +86,42 @@ function updateEnabled(state, petriNet) {
     });
 }
 
-function resetSimulation() {
-    currentState = petriNet.initialState.slice();
+function updateCurrentStateDisplay(state, petriNet) {
+    const currentStateTextarea = document.getElementById('current-state');
+    let stateText = "Current State:\n";
+    petriNet.places.forEach((index, placeId) => {
+        stateText += `${placeId}: ${state[index]}\n`;
+    });
+    currentStateTextarea.value = stateText;
+}
+
+function updateTraceDisplay() {
+    const traceDiv = document.getElementById('trace');
+    traceDiv.innerHTML = "";
+
+    trace.getTransitions().forEach(transitionId => {
+        const transitionItem = document.createElement('div');
+        transitionItem.innerText = transitionId;
+        traceDiv.appendChild(transitionItem);
+    });
+}
+
+function fireTransition(transitionId) {
+    currentState = petriNet.fireTransition(currentState, transitionId);
+    trace.addTransition(transitionId);
     updateCytoShownState(simulationCy, petriNet, currentState);
     updateEnabled(currentState, petriNet);
+    updateCurrentStateDisplay(currentState, petriNet);
+    updateTraceDisplay();
+}
+
+function resetSimulation() {
+    currentState = petriNet.initialState.slice();
+    trace.clear();
+    updateCytoShownState(simulationCy, petriNet, currentState);
+    updateEnabled(currentState, petriNet);
+    updateCurrentStateDisplay(currentState, petriNet);
+    updateTraceDisplay();
 }
 
 export { enterSimulationMode };

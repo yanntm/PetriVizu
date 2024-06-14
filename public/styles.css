@@ -19,3 +19,80 @@
 #palette {
     margin-bottom: 10px;
 }
+
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+#simulation-controls {
+    width: 20%;
+    height: 100%;
+    float: left;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-right: 1px solid #ccc;
+}
+
+#simulation-controls div, #simulation-controls textarea, #simulation-controls button {
+    margin-bottom: 10px;
+}
+
+#enabled-transitions, #current-state, #trace {
+    padding: 10px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    overflow-y: auto;
+}
+
+#enabled-transitions {
+    height: 150px;
+}
+
+#current-state {
+    height: 100px;
+    resize: none;
+}
+
+#trace {
+    height: 300px;
+}
+
+#enabled-transitions:before, #current-state:before, #trace:before {
+    content: attr(title);
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+}
+
+#reset {
+    width: 100%;
+    padding: 5px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+#reset:hover {
+    background-color: #45a049;
+}
+
+#simulation-cy-container {
+    width: 75%;
+    height: 100%;
+    float: left;
+    padding: 10px;
+    background-color: #fff;
+    border-left: 1px solid #ccc;
+}
+
+#simulation-cy {
+    width: 100%;
+    height: 600px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+}
