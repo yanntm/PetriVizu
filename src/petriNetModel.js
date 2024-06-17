@@ -1,3 +1,5 @@
+import { Graphics } from './graphics.js';
+
 class PetriNet {
   constructor() {
     this.places = new Map();
@@ -7,6 +9,7 @@ class PetriNet {
     this.pre = [];
     this.post = [];
     this.initialState = [];
+    this.graphics = new Graphics();
   }
 
   addPlace(id, name, tokens) {
@@ -166,6 +169,10 @@ class PetriNet {
       });
     });
     return arcs;
+  }
+  
+  getGraphics() {
+        return this.graphics;
   }
 }
 
