@@ -35,7 +35,7 @@ body {
 }
 
 #simulation-controls div, #simulation-controls textarea, #simulation-controls button {
-    margin-bottom: 10px;
+    margin-bottom: 2px;
 }
 
 #enabled-transitions, #current-state, #trace {
@@ -50,6 +50,7 @@ body {
 }
 
 #current-state {
+    width: calc(100% - 22px); /* Adjust to fit the width of the container */
     height: 100px;
     resize: none;
 }
@@ -58,7 +59,7 @@ body {
     height: 300px;
 }
 
-#enabled-transitions:before, #current-state:before, #trace:before {
+#enabled-transitions:before, #current-state-wrapper:before, #trace:before {
     content: attr(title);
     display: block;
     font-weight: bold;

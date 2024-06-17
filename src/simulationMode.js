@@ -88,7 +88,7 @@ function updateEnabled(state, petriNet) {
 
 function updateCurrentStateDisplay(state, petriNet) {
     const currentStateTextarea = document.getElementById('current-state');
-    let stateText = "Current State:\n";
+    let stateText = "";
     petriNet.places.forEach((index, placeId) => {
         stateText += `${placeId}: ${state[index]}\n`;
     });

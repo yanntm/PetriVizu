@@ -34,14 +34,17 @@
 	<div id="simulation" class="tab-content" style="display:none;">
 	    <div id="simulation-controls">
 	        <button id="reset" title="Reset Simulation">🔄 Reset</button>
-	        <div id="enabled-transitions" title="Enabled Transitions"></div>
-	        <textarea id="current-state" title="Current State" readonly></textarea>
-	        <div id="trace" title="Trace"></div>
+	        <div id="enabled-transitions" title="Enabled Transitions">Enabled Transitions:</div>
+	        <div id="current-state-wrapper" title="Current State">
+	            <textarea id="current-state" readonly></textarea>
+	        </div>
+	        <div id="trace" title="Trace">Trace:</div>
 	    </div>
 	    <div id="simulation-cy-container">
 	        <div id="simulation-cy"></div>
 	    </div>
 	</div>
+
 
     <script>
         function openTab(tabName) {
