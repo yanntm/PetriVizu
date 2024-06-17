@@ -1,19 +1,19 @@
 class Trace {
-    constructor() {
-        this.transitions = [];
-    }
+	constructor() {
+		this.transitions = [];
+	}
 
-    addTransition(transitionId) {
-        this.transitions.push(transitionId);
-    }
+	addTransition(transitionId) {
+		this.transitions.push(transitionId);
+	}
 
-    getTransitions() {
-        return this.transitions;
-    }
+	getTransitions() {
+		return this.transitions;
+	}
 
-    clear() {
-        this.transitions = [];
-    }
+	clear() {
+		this.transitions = [];
+	}
 }
 
 export default Trace;
