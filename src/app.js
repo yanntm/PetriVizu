@@ -2,6 +2,7 @@ import ViewMode from './viewMode.js';
 import EditMode from './editMode.js';
 import SimulationMode from './simulationMode.js';
 import { buildExample } from './example.js';
+import LayoutHandler from './layoutHandler.js';
 
 let currentMode;
 const sharedState = {
@@ -11,10 +12,12 @@ const sharedState = {
 const viewMode = new ViewMode(sharedState);
 const editMode = new EditMode(sharedState);
 const simulationMode = new SimulationMode(sharedState);
+const layoutHandler = new LayoutHandler();
 
 document.addEventListener('DOMContentLoaded', () => {
     currentMode = viewMode;
     currentMode.activate();
+    layoutHandler.setCurrentMode(currentMode);
 
     document.querySelectorAll('.tab-button').forEach(button => {
         button.addEventListener('click', (event) => {
@@ -42,6 +45,7 @@ function switchTab(tabName) {
 
     updateTabContent(tabName);
     currentMode.activate();
+    layoutHandler.setCurrentMode(currentMode);
 }
 
 function updateTabContent(tabName) {
