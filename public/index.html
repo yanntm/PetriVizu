@@ -13,6 +13,11 @@
         <button class="tab-button" data-tab="editor">Editor</button>
         <button class="tab-button" data-tab="simulation">Simulation</button>
     </div>
+    <div id="layout-tools">
+        <button id="fit-button" title="Fit the graph to view">Fit</button>
+        <select id="layout-dropdown" title="Select a layout"></select>
+        <button id="apply-layout-button" title="Apply the selected layout">Layout</button>
+    </div>
     <div id="viewer" class="tab-content" style="display: block;">
         <div id="viewer-menu">
             <button id="fileOpen">File -> Open</button>
@@ -22,7 +27,7 @@
     </div>
     <div id="editor" class="tab-content" style="display:none;">
         <div id="palette">
-            <button id="selectMove" title="Select/Move Tool">🖐</button>
+            <button id="selectMove" title="Select/Move Tool">🖐️</button>
             <button id="addPlace" title="Add Place">🔵</button>
             <button id="addTransition" title="Add Transition">⬛</button>
             <button id="addArc" title="Add Arc">➡</button>
