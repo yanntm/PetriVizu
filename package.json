@@ -14,7 +14,9 @@
   "dependencies": {
     "buffer": "^6.0.3",
     "cytoscape": "^3.29.2",
+    "cytoscape-dagre": "^2.5.0",
     "cytoscape-edgehandles": "^4.0.1",
+    "cytoscape-fcose": "^2.2.0",
     "express": "^4.19.2",
     "sax": "^1.4.1",
     "stream-browserify": "^3.0.0"
