@@ -1,4 +1,5 @@
-import Mode from './modeInterface.js';
+// editMode.js
+import AbstractMode from './abstractMode.js';
 import cytoscape from 'cytoscape';
 import edgehandles from 'cytoscape-edgehandles';
 import { PetriNet } from './petriNetModel';
@@ -6,62 +7,64 @@ import { initCytoscape, updateCytoscapeCommon,syncGraphicsFromCy } from './cytos
 
 cytoscape.use(edgehandles);
 
-export default class EditMode extends Mode {
-  constructor(sharedState) {
-    super();
-    this.sharedState = sharedState;
-    this.cy = initCytoscape('editor-cy');
-    this.currentTool = 'selectMove';
-    this.eh = null;
-    this.setupEdgehandles();
-    this.setupEventListeners();    
-  }
+export default class EditMode extends AbstractMode {
+    constructor(sharedState) {
+        super(sharedState, 'editor-cy');
+        this.currentTool = 'selectMove';
+        this.eh = null;
+        this.setupEdgehandles();
+        this.setupEventListeners();
+    }
 
-  activate() {
-    updateCytoscapeCommon(this.cy, this.sharedState.petriNet, true);
-    this.cy.fit();
-  }
+    activate() {
+        updateCytoscapeCommon(this.cy, this.sharedState.petriNet, true);
+        this.cy.fit();
+    }
 
-  deactivate() {
-    syncGraphicsFromCy(this.cy, this.sharedState.petriNet);
-  }
+    setupEdgehandles() {
+        this.eh = this.cy.edgehandles({
+            toggleOffOnLeave: true,
+            handleNodes: "node",
+            handleSize: 10,
+            edgeType: function () {
+                return 'flat';
+            },
+            canConnect: function (sourceNode, targetNode) {
+                const sourceIsPlace = sourceNode.hasClass('place');
+                const targetIsPlace = targetNode.hasClass('place');
+                const sourceIsTransition = sourceNode.hasClass('transition');
+                const targetIsTransition = targetNode.hasClass('transition');
+                return (sourceIsPlace && targetIsTransition) || (sourceIsTransition && targetIsPlace);
+            },
+            edgeParams: function (sourceNode, targetNode) {
+                return { data: { label: '1' } };
+            },
+            hoverDelay: 150,
+            snap: true,
+            snapThreshold: 50,
+            snapFrequency: 15,
+            noEdgeEventsInDraw: true,
+            disableBrowserGestures: true
+        });
 
-  setSharedState(sharedState) {
-    this.sharedState = sharedState;
-  }
+        this.cy.on('ehcomplete', (event, sourceNode, targetNode, addedEdge) => {
+            console.log('Edge added:', sourceNode.id(), targetNode.id(), addedEdge.id());
+            this.addArc(sourceNode.id(), targetNode.id(), 1);
+        });
+    }
 
-  setupEdgehandles() {
-    this.eh = this.cy.edgehandles({
-      toggleOffOnLeave: true,
-      handleNodes: "node",
-      handleSize: 10,
-      edgeType: function () {
-        return 'flat';
-      },
-      canConnect: function (sourceNode, targetNode) {
-        const sourceIsPlace = sourceNode.hasClass('place');
-        const targetIsPlace = targetNode.hasClass('place');
-        const sourceIsTransition = sourceNode.hasClass('transition');
-        const targetIsTransition = targetNode.hasClass('transition');
-        return (sourceIsPlace && targetIsTransition) || (sourceIsTransition && targetIsPlace);
-      },
-      edgeParams: function (sourceNode, targetNode) {
-        return { data: { label: '1' } };
-      },
-      hoverDelay: 150,
-      snap: true,
-      snapThreshold: 50,
-      snapFrequency: 15,
-      noEdgeEventsInDraw: true,
-      disableBrowserGestures: true
-    });
+    setupEventListeners() {
+        document.getElementById('selectMove').addEventListener('click', () => this.selectTool('selectMove'));
+        document.getElementById('addPlace').addEventListener('click', () => this.selectTool('place'));
+        document.getElementById('addTransition').addEventListener('click', () => this.selectTool('transition'));
+        document.getElementById('addArc').addEventListener('click', () => this.selectTool('arc'));
+        document.getElementById('editText').addEventListener('click', () => this.selectTool('editText'));
+        document.getElementById('delete').addEventListener('click', () => this.selectTool('delete'));
 
-    this.cy.on('ehcomplete', (event, sourceNode, targetNode, addedEdge) => {
-      console.log('Edge added:', sourceNode.id(), targetNode.id(), addedEdge.id());
-      this.addArc(sourceNode.id(), targetNode.id(), 1);
-    });
-  }
-
+        this.cy.on('tap', 'node, edge', (event) => this.handleTapEvent(event));
+        this.cy.on('tap', (event) => this.handleCanvasClick(event));
+    }
+    
   setupEventListeners() {
     document.getElementById('selectMove').addEventListener('click', () => this.selectTool('selectMove'));
     document.getElementById('addPlace').addEventListener('click', () => this.selectTool('place'));

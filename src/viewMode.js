@@ -1,31 +1,18 @@
 // viewMode.js
-import Mode from './modeInterface.js';
+import AbstractMode from './abstractMode.js';
 import cytoscape from 'cytoscape';
 import { loadPetriNet } from './loader.js';
 import { initCytoscape, updateCytoscapeCommon,syncGraphicsFromCy } from './cytoscapeUtils.js';
 
-export default class ViewMode extends Mode {
+export default class ViewMode extends AbstractMode {
     constructor(sharedState) {
-        super();
-        this.sharedState = sharedState;
-        this.cy = initCytoscape('viewer-cy');
+        super(sharedState, 'viewer-cy');
         this.setupFileImport();
-        this.cy.layout({ name: 'cose', padding: 10 }).run().promiseOn('layoutstop').then(() => {
-           this.cy.fit();
-        });
     }
 
     activate() {
-        updateCytoscapeCommon(this.cy, this.sharedState.petriNet, true);        
+        updateCytoscapeCommon(this.cy, this.sharedState.petriNet, true);
         this.cy.fit();
-    }
-
-    deactivate() {
-        syncGraphicsFromCy(this.cy, this.sharedState.petriNet);
-    }
-
-    setSharedState(sharedState) {
-        this.sharedState = sharedState;
     }
 
     setupFileImport() {

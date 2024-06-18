@@ -1,51 +1,39 @@
-import Mode from './modeInterface.js';
-import cytoscape from 'cytoscape';
-import cytoscapeStyles from './cytoscapeStyles.js';
+import AbstractMode from './abstractMode.js';
 
 import { createCytoscapeElements, syncGraphicsFromCy, initCytoscape } from './cytoscapeUtils.js';
 import Trace from './trace.js';
 
-export default class SimulationMode extends Mode {
-  constructor(sharedState) {
-    super();
-    this.sharedState = sharedState;
-    this.cy = initCytoscape('simulation-cy');
-    this.currentState = this.sharedState.petriNet.initialState.slice();
-    this.currentEnabled = [];
-    this.trace = new Trace();
-    this.setupEventListeners();
-  }
+export default class SimulationMode extends AbstractMode {
+    constructor(sharedState) {
+        super(sharedState, 'simulation-cy');
+        this.currentState = this.sharedState.petriNet.initialState.slice();
+        this.currentEnabled = [];
+        this.trace = new Trace();
+        this.setupEventListeners();
+    }
 
-  activate() {
-    this.currentState = this.sharedState.petriNet.initialState.slice();
-    updateCytoscapeCommon(this.cy, this.sharedState.petriNet, true);
-    this.updateCytoShownState();
-    this.updateEnabled();
-    this.updateCurrentStateDisplay();
-    this.updateTraceDisplay();
-    this.cy.fit();
-  }
+    activate() {
+        this.currentState = this.sharedState.petriNet.initialState.slice();
+        updateCytoscapeCommon(this.cy, this.sharedState.petriNet, true);
+        this.updateCytoShownState();
+        this.updateEnabled();
+        this.updateCurrentStateDisplay();
+        this.updateTraceDisplay();
+        this.cy.fit();
+    }
 
-  deactivate() {
-    syncGraphicsFromCy(this.cy, this.sharedState.petriNet);
-  }
+    setupEventListeners() {
+        this.cy.on('tap', 'node.transition', (event) => {
+            const transitionId = event.target.id();
+            if (this.currentEnabled.includes(transitionId)) {
+                this.fireTransition(transitionId);
+            }
+        });
 
-  setSharedState(sharedState) {
-    this.sharedState = sharedState;
-    this.currentState = this.sharedState.petriNet.initialState.slice();
-  }
-
-  setupEventListeners() {
-    this.cy.on('tap', 'node.transition', (event) => {
-      const transitionId = event.target.id();
-      if (this.currentEnabled.includes(transitionId)) {
-        this.fireTransition(transitionId);
-      }
-    });
-
-    document.getElementById('reset').addEventListener('click', () => this.resetSimulation());
-  }
-
+        document.getElementById('reset').addEventListener('click', () => this.resetSimulation());
+    }
+    
+    
   updateCytoShownState() {
     this.cy.nodes().forEach(node => {
       if (node.hasClass('place')) {
