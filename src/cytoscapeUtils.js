@@ -1,3 +1,8 @@
+import PetriNet from './petriNetModel';
+import cytoscape from 'cytoscape';
+import cytoscapeStyles from './cytoscapeStyles';
+
+
 function createCytoscapeElements(petriNet, options = {}) {
     const elements = [];
     const { showAllLabels = false } = options;
@@ -58,4 +63,15 @@ function syncGraphicsFromCy(cy, petriNet) {
     });
 }
 
-export { createCytoscapeElements, updateCytoscapeCommon, syncGraphicsFromCy };
+function initCytoscape(containerId) {
+  const cy = cytoscape({
+    container: document.getElementById(containerId),
+    style: cytoscapeStyles,
+    layout: { name: 'cose', fit:true, padding: 10 }
+  });
+
+  return cy;
+}
+
+
+export { createCytoscapeElements, updateCytoscapeCommon, syncGraphicsFromCy, initCytoscape };

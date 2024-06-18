@@ -1,142 +1,146 @@
+import Mode from './modeInterface.js';
 import cytoscape from 'cytoscape';
 import cytoscapeStyles from './cytoscapeStyles.js';
-import { createCytoscapeElements } from './cytoscapeUtils.js';
+
+import { createCytoscapeElements, syncGraphicsFromCy, initCytoscape } from './cytoscapeUtils.js';
 import Trace from './trace.js';
 
-let simulationCy;
-let currentState;
-let currentEnabled = [];
-let petriNet;
-let trace = new Trace();
-
-function enterSimulationMode(existingNet) {
-  petriNet = existingNet || new PetriNet();
-  currentState = petriNet.initialState.slice(); // Copy initial state
-
-  if (!simulationCy) {
-    simulationCy = initCytoscape(petriNet, 'simulation-cy');
-  } else {
-    updateCytoscapeElements(simulationCy, petriNet);
+export default class SimulationMode extends Mode {
+  constructor(sharedState) {
+    super();
+    this.sharedState = sharedState;
+    this.cy = initCytoscape('simulation-cy');
+    this.currentState = this.sharedState.petriNet.initialState.slice();
+    this.currentEnabled = [];
+    this.trace = new Trace();
+    this.setupEventListeners();
   }
 
-  updateCytoShownState(simulationCy, petriNet, currentState);
-  updateEnabled(currentState, petriNet);
-  updateCurrentStateDisplay(currentState, petriNet);
-  updateTraceDisplay();
+  activate() {
+    this.currentState = this.sharedState.petriNet.initialState.slice();
+    updateCytoscapeCommon(this.cy, this.sharedState.petriNet, true);
+    this.updateCytoShownState();
+    this.updateEnabled();
+    this.updateCurrentStateDisplay();
+    this.updateTraceDisplay();
+    this.cy.fit();
+  }
 
-  simulationCy.on('tap', 'node.transition', function(event) {
-    const transitionId = event.target.id();
-    if (currentEnabled.includes(transitionId)) {
-      fireTransition(transitionId);
-    }
-  });
+  deactivate() {
+    syncGraphicsFromCy(this.cy, this.sharedState.petriNet);
+  }
 
-  document.getElementById('reset').addEventListener('click', resetSimulation);
+  setSharedState(sharedState) {
+    this.sharedState = sharedState;
+    this.currentState = this.sharedState.petriNet.initialState.slice();
+  }
+
+  setupEventListeners() {
+    this.cy.on('tap', 'node.transition', (event) => {
+      const transitionId = event.target.id();
+      if (this.currentEnabled.includes(transitionId)) {
+        this.fireTransition(transitionId);
+      }
+    });
+
+    document.getElementById('reset').addEventListener('click', () => this.resetSimulation());
+  }
+
+  updateCytoShownState() {
+    this.cy.nodes().forEach(node => {
+      if (node.hasClass('place')) {
+        const placeId = node.data('id');
+        const placeIndex = this.sharedState.petriNet.places.get(placeId);
+        const marking = this.currentState[placeIndex];
+        const labelParts = node.data('label').split('\n');
+        const name = labelParts[0];
+        node.data('label', `${name}\n${marking}`);
+      }
+    });
+  }
+
+  updateEnabled() {
+    this.currentEnabled = this.sharedState.petriNet.getEnabledTransitions(this.currentState);
+    const enabledTransitionsDiv = document.getElementById('enabled-transitions');
+    enabledTransitionsDiv.innerHTML = "";
+
+    this.currentEnabled.forEach(transitionId => {
+      const transitionItem = document.createElement('div');
+      transitionItem.innerText = transitionId;
+      transitionItem.style.cursor = 'pointer';
+      transitionItem.addEventListener('click', () => {
+        this.fireTransition(transitionId);
+      });
+      enabledTransitionsDiv.appendChild(transitionItem);
+    });
+
+    this.cy.nodes().forEach(node => {
+      if (node.hasClass('transition')) {
+        if (this.currentEnabled.includes(node.id())) {
+          node.style('background-color', 'green');
+        } else {
+          node.style('background-color', 'grey');
+        }
+      }
+    });
+  }
+
+  updateCurrentStateDisplay() {
+    const currentStateTextarea = document.getElementById('current-state');
+    let stateText = "";
+    this.sharedState.petriNet.places.forEach((index, placeId) => {
+      stateText += `${placeId}: ${this.currentState[index]}\n`;
+    });
+    currentStateTextarea.value = stateText;
+  }
+
+  updateTraceDisplay() {
+    const traceDiv = document.getElementById('trace');
+    traceDiv.innerHTML = "";
+
+    this.trace.getTransitions().forEach(transitionId => {
+      const transitionItem = document.createElement('div');
+      transitionItem.innerText = transitionId;
+      traceDiv.appendChild(transitionItem);
+    });
+  }
+
+  fireTransition(transitionId) {
+    this.currentState = this.sharedState.petriNet.fireTransition(this.currentState, transitionId);
+    this.trace.addTransition(transitionId);
+    this.updateCytoShownState();
+    this.updateEnabled();
+    this.updateCurrentStateDisplay();
+    this.updateTraceDisplay();
+  }
+
+  resetSimulation() {
+    this.currentState = this.sharedState.petriNet.initialState.slice();
+    this.trace.clear();
+    this.updateCytoShownState();
+    this.updateEnabled();
+    this.updateCurrentStateDisplay();
+    this.updateTraceDisplay();
+  }
 }
-
+/*
 function initCytoscape(petriNet, containerId) {
   const cy = cytoscape({
     container: document.getElementById(containerId),
     style: cytoscapeStyles,
-    layout: { name: 'cose', padding: 10 }
+    layout: { name: 'preset', padding: 10 }
   });
 
   const elements = createCytoscapeElements(petriNet, { showAllLabels: true });
   cy.add(elements);
-
-  cy.layout({ name: 'cose', padding: 10 }).run().promiseOn('layoutstop').then(() => {
-    cy.fit();
-  });
 
   return cy;
-}
+}*/
 
-function updateCytoscapeElements(cy, petriNet) {
-  const elements = createCytoscapeElements(petriNet, { showAllLabels: true });
+function updateCytoscapeCommon(cy, petriNet, showAllLabels = false) {
+  const elements = createCytoscapeElements(petriNet, { showAllLabels });
   cy.elements().remove();
   cy.add(elements);
-
-  cy.layout({ name: 'cose', padding: 10 }).run().promiseOn('layoutstop').then(() => {
-    cy.fit();
-  });
 }
 
-function updateCytoShownState(cy, petriNet, state) {
-  cy.nodes().forEach(node => {
-    if (node.hasClass('place')) {
-      const placeId = node.data('id');
-      const placeIndex = petriNet.places.get(placeId);
-      const marking = state[placeIndex];
-      const labelParts = node.data('label').split('\n');
-      const name = labelParts[0];
-      node.data('label', `${name}\n${marking}`);
-    }
-  });
-}
-
-function updateEnabled(state, petriNet) {
-  currentEnabled = petriNet.getEnabledTransitions(state);
-  const enabledTransitionsDiv = document.getElementById('enabled-transitions');
-  enabledTransitionsDiv.innerHTML = "";
-
-  currentEnabled.forEach(transitionId => {
-    const transitionName = transitionId;
-    const transitionItem = document.createElement('div');
-    transitionItem.innerText = transitionName;
-    transitionItem.style.cursor = 'pointer';
-    transitionItem.addEventListener('click', () => {
-      fireTransition(transitionId);
-    });
-    enabledTransitionsDiv.appendChild(transitionItem);
-  });
-
-  simulationCy.nodes().forEach(node => {
-    if (node.hasClass('transition')) {
-      if (currentEnabled.includes(node.id())) {
-        node.style('background-color', 'green');
-      } else {
-        node.style('background-color', 'grey');
-      }
-    }
-  });
-}
-
-function updateCurrentStateDisplay(state, petriNet) {
-  const currentStateTextarea = document.getElementById('current-state');
-  let stateText = "";
-  petriNet.places.forEach((index, placeId) => {
-    stateText += `${placeId}: ${state[index]}\n`;
-  });
-  currentStateTextarea.value = stateText;
-}
-
-function updateTraceDisplay() {
-  const traceDiv = document.getElementById('trace');
-  traceDiv.innerHTML = "";
-
-  trace.getTransitions().forEach(transitionId => {
-    const transitionItem = document.createElement('div');
-    transitionItem.innerText = transitionId;
-    traceDiv.appendChild(transitionItem);
-  });
-}
-
-function fireTransition(transitionId) {
-  currentState = petriNet.fireTransition(currentState, transitionId);
-  trace.addTransition(transitionId);
-  updateCytoShownState(simulationCy, petriNet, currentState);
-  updateEnabled(currentState, petriNet);
-  updateCurrentStateDisplay(currentState, petriNet);
-  updateTraceDisplay();
-}
-
-function resetSimulation() {
-  currentState = petriNet.initialState.slice();
-  trace.clear();
-  updateCytoShownState(simulationCy, petriNet, currentState);
-  updateEnabled(currentState, petriNet);
-  updateCurrentStateDisplay(currentState, petriNet);
-  updateTraceDisplay();
-}
-
-export { enterSimulationMode };
+export { SimulationMode };

@@ -1,97 +1,50 @@
-import { loadPetriNet } from './loader.js';
-import { initCytoscape, updateCytoscape } from './viewMode.js';
+import ViewMode from './viewMode.js';
+import EditMode from './editMode.js';
+import SimulationMode from './simulationMode.js';
 import { buildExample } from './example.js';
-import { enterEditMode } from './editMode.js';
-import { enterSimulationMode } from './simulationMode.js';
 
-let viewerCy;
-let editorCy;
-let simulationCy;
-let petriNet;
+let currentMode;
+const sharedState = {
+    petriNet: buildExample()
+};
+
+const viewMode = new ViewMode(sharedState);
+const editMode = new EditMode(sharedState);
+const simulationMode = new SimulationMode(sharedState);
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize Viewer with an example Petri net
-  petriNet = buildExample();
-  viewerCy = initCytoscape(petriNet, 'viewer-cy');
-  updateCytoscape(viewerCy, petriNet);
+    currentMode = viewMode;
+    currentMode.activate();
 
-  document.getElementById('fileOpen').addEventListener('click', () => {
-    document.getElementById('fileInput').click();
-  });
-
-  document.getElementById('fileInput').addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const content = e.target.result;
-        petriNet = loadPetriNet(content);
-        updateCytoscape(viewerCy, petriNet);
-        // Update editor too if already initialized
-        if (editorCy) {
-          updateCytoscape(editorCy, petriNet);
-        }
-        // Update simulation too if already initialized
-        if (simulationCy) {
-          enterSimulationMode(petriNet); // Re-enter simulation mode to reset state
-        }
-      };
-      reader.readAsText(file);
-    }
-  });
-
-  // Initialize Editor tab
-  document.querySelector('.tab-button[onclick="openTab(\'editor\')"]').addEventListener('click', () => {
-    if (!editorCy) {
-      editorCy = initCytoscape(petriNet, 'editor-cy');
-      enterEditMode(petriNet);
-    } else {
-      updateCytoscape(editorCy, petriNet);
-    }
-  });
-
-  // Initialize Simulation tab
-  document.querySelector('.tab-button[onclick="openTab(\'simulation\')"]').addEventListener('click', () => {
-    if (!simulationCy) {
-      simulationCy = initCytoscape(petriNet, 'simulation-cy');
-      enterSimulationMode(petriNet);
-    } else {
-      updateCytoscape(simulationCy, petriNet);
-    }
-  });
-
-  // Handle tab switching
-  document.querySelectorAll('.tab-button').forEach(button => {
-    button.addEventListener('click', (event) => {
-      const tabName = event.target.getAttribute('onclick').match(/openTab\('([^']+)'\)/)[1];
-      openTab(tabName);
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const tabName = event.target.getAttribute('onclick').match(/openTab\('([^']+)'\)/)[1];
+            switchTab(tabName);
+        });
     });
-  });
 });
 
-function openTab(tabName) {
-  const tabs = document.getElementsByClassName('tab-content');
-  for (let i = 0; i < tabs.length; i++) {
-    tabs[i].style.display = 'none';
-  }
-  document.getElementById(tabName).style.display = 'block';
+function switchTab(tabName) {
+    if (currentMode) {
+        currentMode.deactivate();
+    }
 
-  if (tabName === 'editor') {
-    if (!editorCy) {
-      editorCy = initCytoscape(petriNet, 'editor-cy');
-      enterEditMode(petriNet);
-    } else {
-      updateCytoscape(editorCy, petriNet);
+    if (tabName === 'editor') {
+        currentMode = editMode;
+    } else if (tabName === 'viewer') {
+        currentMode = viewMode;
+    } else if (tabName === 'simulation') {
+        currentMode = simulationMode;
     }
-  } else if (tabName === 'viewer') {
-    updateCytoscape(viewerCy, petriNet);
-  } else if (tabName === 'simulation') {
-    if (!simulationCy) {
-      simulationCy = initCytoscape(petriNet, 'simulation-cy');
-      enterSimulationMode(petriNet);
-    } else {
-      updateCytoscape(simulationCy, petriNet);
-      enterSimulationMode(petriNet);
+
+    updateTabContent(tabName);
+    currentMode.activate();
+}
+
+function updateTabContent(tabName) {
+    const tabs = document.getElementsByClassName('tab-content');
+    for (let i = 0; i < tabs.length; i++) {
+        tabs[i].style.display = 'none';
     }
-  }
+    document.getElementById(tabName).style.display = 'block';
 }
