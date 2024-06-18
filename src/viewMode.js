@@ -1,6 +1,7 @@
 import AbstractMode from './abstractMode.js';
 import { loadPetriNet } from './loader.js';
 import { updateCytoscapeCommon } from './cytoscapeUtils.js';
+import { exportToPNML } from './exporter.js';
 
 export default class ViewMode extends AbstractMode {
     constructor(sharedState) {
@@ -9,6 +10,7 @@ export default class ViewMode extends AbstractMode {
         // Bind methods to ensure the correct context
         this.onFileOpenClick = this.onFileOpenClick.bind(this);
         this.onFileInputChange = this.onFileInputChange.bind(this);
+        this.onFileExportClick = this.onFileExportClick.bind(this);
 
         this.setupFileImport();
     }
@@ -21,6 +23,7 @@ export default class ViewMode extends AbstractMode {
     setupFileImport() {
         document.getElementById('fileOpen').addEventListener('click', this.onFileOpenClick);
         document.getElementById('fileInput').addEventListener('change', this.onFileInputChange);
+        document.getElementById('fileExport').addEventListener('click', this.onFileExportClick);
     }
 
     onFileOpenClick() {
@@ -38,5 +41,9 @@ export default class ViewMode extends AbstractMode {
             };
             reader.readAsText(file);
         }
+    }
+
+    onFileExportClick() {
+        exportToPNML(this.sharedState.petriNet);
     }
 }
