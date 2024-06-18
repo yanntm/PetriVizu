@@ -8,15 +8,17 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="tab-menu">
-        <button class="tab-button" data-tab="viewer">Viewer</button>
-        <button class="tab-button" data-tab="editor">Editor</button>
-        <button class="tab-button" data-tab="simulation">Simulation</button>
-    </div>
-    <div id="layout-tools">
-        <button id="fit-button" title="Fit the graph to view">Fit</button>
-        <select id="layout-dropdown" title="Select a layout"></select>
-        <button id="apply-layout-button" title="Apply the selected layout">Layout</button>
+    <div class="top-bar">
+        <div class="tab-menu">
+            <button class="tab-button" data-tab="viewer">Viewer</button>
+            <button class="tab-button" data-tab="editor">Editor</button>
+            <button class="tab-button" data-tab="simulation">Simulation</button>
+        </div>
+        <div id="layout-tools">
+            <button id="fit-button" title="Fit the graph to view">Fit</button>
+            <select id="layout-dropdown" title="Select a layout"></select>
+            <button id="apply-layout-button" title="Apply the selected layout">Apply Layout</button>
+        </div>
     </div>
     <div id="viewer" class="tab-content" style="display: block;">
         <div id="viewer-menu">
