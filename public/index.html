@@ -9,9 +9,9 @@
 </head>
 <body>
     <div class="tab-menu">
-        <button class="tab-button" onclick="openTab('viewer')">Viewer</button>
-        <button class="tab-button" onclick="openTab('editor')">Editor</button>
-        <button class="tab-button" onclick="openTab('simulation')">Simulation</button>
+        <button class="tab-button" data-tab="viewer">Viewer</button>
+        <button class="tab-button" data-tab="editor">Editor</button>
+        <button class="tab-button" data-tab="simulation">Simulation</button>
     </div>
     <div id="viewer" class="tab-content" style="display: block;">
         <div id="viewer-menu">
@@ -22,43 +22,27 @@
     </div>
     <div id="editor" class="tab-content" style="display:none;">
         <div id="palette">
-            <button id="selectMove" title="Select/Move Tool">🖐️</button>
+            <button id="selectMove" title="Select/Move Tool">🖐</button>
             <button id="addPlace" title="Add Place">🔵</button>
             <button id="addTransition" title="Add Transition">⬛</button>
-            <button id="addArc" title="Add Arc">➡️</button>
+            <button id="addArc" title="Add Arc">➡</button>
             <button id="editText" title="Edit Text">abc...</button>
             <button id="delete" title="Delete Tool">❌</button>
         </div>
         <div id="editor-cy"></div>
     </div>
-	<div id="simulation" class="tab-content" style="display:none;">
-	    <div id="simulation-controls">
-	        <button id="reset" title="Reset Simulation">🔄 Reset</button>
-	        <div id="enabled-transitions" title="Enabled Transitions">Enabled Transitions:</div>
-	        <div id="current-state-wrapper" title="Current State">
-	            <textarea id="current-state" readonly></textarea>
-	        </div>
-	        <div id="trace" title="Trace">Trace:</div>
-	    </div>
-	    <div id="simulation-cy-container">
-	        <div id="simulation-cy"></div>
-	    </div>
-	</div>
-
-
-    <script>
-        function openTab(tabName) {
-            const tabs = document.getElementsByClassName('tab-content');
-            for (let i = 0; i < tabs.length; i++) {
-                tabs[i].style.display = 'none';
-            }
-            document.getElementById(tabName).style.display = 'block';
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // Ensure the viewer tab is visible by default
-            openTab('viewer');
-        });
-    </script>
+    <div id="simulation" class="tab-content" style="display:none;">
+        <div id="simulation-controls">
+            <button id="reset" title="Reset Simulation">🔄 Reset</button>
+            <div id="enabled-transitions" title="Enabled Transitions">Enabled Transitions:</div>
+            <div id="current-state-wrapper" title="Current State">
+                <textarea id="current-state" readonly></textarea>
+            </div>
+            <div id="trace" title="Trace">Trace:</div>
+        </div>
+        <div id="simulation-cy-container">
+            <div id="simulation-cy"></div>
+        </div>
+    </div>
 </body>
 </html>

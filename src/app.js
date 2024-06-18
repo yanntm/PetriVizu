@@ -18,10 +18,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.tab-button').forEach(button => {
         button.addEventListener('click', (event) => {
-            const tabName = event.target.getAttribute('onclick').match(/openTab\('([^']+)'\)/)[1];
+            const tabName = event.target.getAttribute('data-tab');
             switchTab(tabName);
         });
     });
+
+    // Ensure the viewer tab is visible by default
+    switchTab('viewer');
 });
 
 function switchTab(tabName) {
