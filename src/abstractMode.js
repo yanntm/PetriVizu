@@ -1,8 +1,9 @@
+// abstractMode.js
 import cytoscape from 'cytoscape';
 import cytoscapeStyles from './cytoscapeStyles.js';
 import { syncGraphicsFromCy } from './cytoscapeUtils.js';
 
-// abstractMode.js
+
 export default class AbstractMode {
     constructor(sharedState, containerId) {
         if (new.target === AbstractMode) {
