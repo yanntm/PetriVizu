@@ -1,11 +1,14 @@
-import AbstractMode from './abstractMode.js';
+// simulationMode.js
 
+import AbstractMode from './abstractMode.js';
 import { createCytoscapeElements, syncGraphicsFromCy, initCytoscape } from './cytoscapeUtils.js';
 import Trace from './trace.js';
+import StateGraphView from './stateGraphView.js';
 
 export default class SimulationMode extends AbstractMode {
-    constructor(sharedState) {
+    constructor(sharedState, stateGraphView) {
         super(sharedState, 'simulation-cy');
+        this.stateGraphView = new StateGraphView('state-graph-cy', this.sharedState.petriNet);
         this.currentState = this.sharedState.petriNet.initialState.slice();
         this.currentEnabled = [];
         this.trace = new Trace();
@@ -19,6 +22,7 @@ export default class SimulationMode extends AbstractMode {
         this.updateEnabled();
         this.updateCurrentStateDisplay();
         this.updateTraceDisplay();
+        this.stateGraphView.updateCurrentState(this.currentState); // Update state graph view
         this.cy.fit();
     }
 
@@ -33,97 +37,91 @@ export default class SimulationMode extends AbstractMode {
         document.getElementById('reset').addEventListener('click', () => this.resetSimulation());
     }
     
-    
-  updateCytoShownState() {
-    this.cy.nodes().forEach(node => {
-      if (node.hasClass('place')) {
-        const placeId = node.data('id');
-        const placeIndex = this.sharedState.petriNet.places.get(placeId);
-        const marking = this.currentState[placeIndex];
-        const labelParts = node.data('label').split('\n');
-        const name = labelParts[0];
-        node.data('label', `${name}\n${marking}`);
-      }
-    });
-  }
+    updateCytoShownState() {
+        this.cy.nodes().forEach(node => {
+            if (node.hasClass('place')) {
+                const placeId = node.data('id');
+                const placeIndex = this.sharedState.petriNet.places.get(placeId);
+                const marking = this.currentState[placeIndex];
+                const labelParts = node.data('label').split('\n');
+                const name = labelParts[0];
+                node.data('label', `${name}\n${marking}`);
+            }
+        });
+    }
 
-  updateEnabled() {
-    this.currentEnabled = this.sharedState.petriNet.getEnabledTransitions(this.currentState);
-    const enabledTransitionsDiv = document.getElementById('enabled-transitions');
-    enabledTransitionsDiv.innerHTML = "";
+    updateEnabled() {
+        this.currentEnabled = this.sharedState.petriNet.getEnabledTransitions(this.currentState);
+        const enabledTransitionsDiv = document.getElementById('enabled-transitions');
+        enabledTransitionsDiv.innerHTML = "";
 
-    this.currentEnabled.forEach(transitionId => {
-      const transitionItem = document.createElement('div');
-      transitionItem.innerText = transitionId;
-      transitionItem.style.cursor = 'pointer';
-      transitionItem.addEventListener('click', () => {
-        this.fireTransition(transitionId);
-      });
-      enabledTransitionsDiv.appendChild(transitionItem);
-    });
+        this.currentEnabled.forEach(transitionId => {
+            const transitionItem = document.createElement('div');
+            transitionItem.innerText = transitionId;
+            transitionItem.style.cursor = 'pointer';
+            transitionItem.addEventListener('click', () => {
+                this.fireTransition(transitionId);
+            });
+            enabledTransitionsDiv.appendChild(transitionItem);
+        });
 
-    this.cy.nodes().forEach(node => {
-      if (node.hasClass('transition')) {
-        if (this.currentEnabled.includes(node.id())) {
-          node.style('background-color', 'green');
-        } else {
-          node.style('background-color', 'grey');
-        }
-      }
-    });
-  }
+        this.cy.nodes().forEach(node => {
+            if (node.hasClass('transition')) {
+                if (this.currentEnabled.includes(node.id())) {
+                    node.style('background-color', 'green');
+                } else {
+                    node.style('background-color', 'grey');
+                }
+            }
+        });
+    }
 
-  updateCurrentStateDisplay() {
-    const currentStateTextarea = document.getElementById('current-state');
-    let stateText = "";
-    this.sharedState.petriNet.places.forEach((index, placeId) => {
-      stateText += `${placeId}: ${this.currentState[index]}\n`;
-    });
-    currentStateTextarea.value = stateText;
-  }
+    updateCurrentStateDisplay() {
+        const currentStateTextarea = document.getElementById('current-state');
+        let stateText = "";
+        this.sharedState.petriNet.places.forEach((index, placeId) => {
+            stateText += `${placeId}: ${this.currentState[index]}\n`;
+        });
+        currentStateTextarea.value = stateText;
+    }
 
-  updateTraceDisplay() {
-    const traceDiv = document.getElementById('trace');
-    traceDiv.innerHTML = "";
+    updateTraceDisplay() {
+        const traceDiv = document.getElementById('trace');
+        traceDiv.innerHTML = "";
 
-    this.trace.getTransitions().forEach(transitionId => {
-      const transitionItem = document.createElement('div');
-      transitionItem.innerText = transitionId;
-      traceDiv.appendChild(transitionItem);
-    });
-  }
+        this.trace.getTransitions().forEach(transitionId => {
+            const transitionItem = document.createElement('div');
+            transitionItem.innerText = transitionId;
+            traceDiv.appendChild(transitionItem);
+        });
+    }
 
-  fireTransition(transitionId) {
-    this.currentState = this.sharedState.petriNet.fireTransition(this.currentState, transitionId);
-    this.trace.addTransition(transitionId);
-    this.updateCytoShownState();
-    this.updateEnabled();
-    this.updateCurrentStateDisplay();
-    this.updateTraceDisplay();
-  }
+    fireTransition(transitionId) {
+        const previousState = this.currentState;
+        this.currentState = this.sharedState.petriNet.fireTransition(this.currentState, transitionId);
+        this.trace.addTransition(transitionId);
+        this.stateGraphView.updateCurrentState(this.currentState);
+        const sourceStateId = this.stateGraphView.stateGraph.getId(previousState);
+        const destinationStateId = this.stateGraphView.stateGraph.getId(this.currentState);
+        
+        this.stateGraphView.updateCurrentState(this.currentState);
+        this.updateCytoShownState();
+        this.updateEnabled();
+        this.updateCurrentStateDisplay();
+        this.updateTraceDisplay();
+    }
 
-  resetSimulation() {
-    this.currentState = this.sharedState.petriNet.initialState.slice();
-    this.trace.clear();
-    this.updateCytoShownState();
-    this.updateEnabled();
-    this.updateCurrentStateDisplay();
-    this.updateTraceDisplay();
-  }
+    resetSimulation() {
+        this.currentState = this.sharedState.petriNet.initialState.slice();
+        this.trace.clear();
+        this.stateGraphView = new StateGraphView('stateGraphContainer', this.sharedState.petriNet); // Reinitialize state graph view
+        this.stateGraphView.updateCurrentState(this.currentState);
+        this.updateCytoShownState();
+        this.updateEnabled();
+        this.updateCurrentStateDisplay();
+        this.updateTraceDisplay();
+    }
 }
-/*
-function initCytoscape(petriNet, containerId) {
-  const cy = cytoscape({
-    container: document.getElementById(containerId),
-    style: cytoscapeStyles,
-    layout: { name: 'preset', padding: 10 }
-  });
-
-  const elements = createCytoscapeElements(petriNet, { showAllLabels: true });
-  cy.add(elements);
-
-  return cy;
-}*/
 
 function updateCytoscapeCommon(cy, petriNet, showAllLabels = false) {
   const elements = createCytoscapeElements(petriNet, { showAllLabels });
@@ -132,3 +130,4 @@ function updateCytoscapeCommon(cy, petriNet, showAllLabels = false) {
 }
 
 export { SimulationMode };
+
