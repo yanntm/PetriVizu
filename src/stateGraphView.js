@@ -10,9 +10,12 @@ class StateGraphView {
         this.cy = this.initCytoscape(containerId);
         this.exploredStates = new Set(); // Set to track explored states
         this.currentStateId = null; // Track the current state ID
+        this.listeners = []; // List of listeners for state clicks
 
         // Initialize the layout control
         this.initializeLayoutControl();
+        // Initialize the click event listener
+        this.setupClickListener();
     }
 
     initCytoscape(containerId) {
@@ -64,25 +67,40 @@ class StateGraphView {
         this.cy.layout({ name: layoutName, padding: 10 }).run();
     }
 
-addState(state) {
-    const stateId = this.stateGraph.getId(state);
-    const label = this.stateGraph.getStateLabel(stateId);
-    this.cy.add({
-        group: 'nodes',
-        data: { 
-            id: `state${stateId}`, 
-            label, 
-            color: stateId === this.currentStateId ? '#90ee90' : '#d3d3d3', // Light green for current state, light gray for others
-            borderStyle: this.exploredStates.has(stateId) ? 'solid' : 'dashed',
-            borderColor: stateId === this.stateGraph.getInitialStateId() ? 'blue' : 'black' // Blue border for initial state
-        },
-        style: {
-            'border-color': stateId === this.stateGraph.getInitialStateId() ? 'blue' : 'black'
-        }
-    });
-    this.applyLayout(document.getElementById('layout-dropdown').value); // Apply layout after adding state
-}
+    setupClickListener() {
+        this.cy.on('tap', 'node', (event) => {
+            const stateId = parseInt(event.target.id().replace('state', ''), 10);
+            const state = this.stateGraph.getState(stateId);
+            this.notifyListeners(state);
+        });
+    }
 
+    notifyListeners(state) {
+        this.listeners.forEach(listener => listener(state));
+    }
+
+    addStateClickListener(listener) {
+        this.listeners.push(listener);
+    }
+
+    addState(state) {
+        const stateId = this.stateGraph.getId(state);
+        const label = this.stateGraph.getStateLabel(stateId);
+        this.cy.add({
+            group: 'nodes',
+            data: { 
+                id: `state${stateId}`, 
+                label, 
+                color: stateId === this.currentStateId ? '#90ee90' : '#d3d3d3', // Light green for current state, light gray for others
+                borderStyle: this.exploredStates.has(stateId) ? 'solid' : 'dashed',
+                borderColor: stateId === this.stateGraph.getInitialStateId() ? 'blue' : 'black' // Blue border for initial state
+            },
+            style: {
+                'border-color': stateId === this.stateGraph.getInitialStateId() ? 'blue' : 'black'
+            }
+        });
+        this.applyLayout(document.getElementById('layout-dropdown').value); // Apply layout after adding state
+    }
 
     addTransition(sourceId, destinationId, transitionId) {
         this.stateGraph.addEdge(sourceId, destinationId, transitionId);

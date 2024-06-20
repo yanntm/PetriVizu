@@ -13,6 +13,7 @@ export default class SimulationMode extends AbstractMode {
         this.currentEnabled = [];
         this.trace = new Trace();
         this.setupEventListeners();
+        this.setupStateGraphListener();
     }
 
     activate() {
@@ -38,6 +39,21 @@ export default class SimulationMode extends AbstractMode {
         document.getElementById('reset').addEventListener('click', () => this.resetSimulation());
     }
     
+    setupStateGraphListener() {
+        this.stateGraphView.addStateClickListener((state) => {
+            this.jumpToState(state);
+        });
+    }
+
+    jumpToState(state) {
+        this.trace.clear();
+        this.currentState = state;
+        this.updateCytoShownState();
+        this.updateEnabled();
+        this.updateCurrentStateDisplay();
+        this.updateTraceDisplay();
+    }
+
     updateCytoShownState() {
         this.cy.nodes().forEach(node => {
             if (node.hasClass('place')) {
@@ -130,4 +146,3 @@ function updateCytoscapeCommon(cy, petriNet, showAllLabels = false) {
 }
 
 export { SimulationMode };
-
