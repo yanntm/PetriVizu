@@ -19,7 +19,7 @@ export default class SimulationMode extends AbstractMode {
     activate() {
         this.stateGraphView.clear();
         this.currentState = this.sharedState.petriNet.initialState.slice();
-        updateCytoscapeCommon(this.cy, this.sharedState.petriNet, true);
+        updateCytoscapeCommon(this.cy, this.sharedState.petriNet, false);
         this.updateCytoShownState();
         this.updateEnabled();
         this.updateCurrentStateDisplay();
