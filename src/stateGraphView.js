@@ -71,6 +71,7 @@ class StateGraphView {
         this.cy.on('tap', 'node', (event) => {
             const stateId = parseInt(event.target.id().replace('state', ''), 10);
             const state = this.stateGraph.getState(stateId);
+            this.updateCurrentState(state);
             this.notifyListeners(state);
         });
     }
