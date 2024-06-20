@@ -27,7 +27,11 @@ class StateGraphView {
                         'text-halign': 'center',
                         'background-color': 'data(color)',
                         'border-style': 'data(borderStyle)',
-                        'border-width': '2px'
+                        'border-width': '2px',
+                        'width': 'label',
+                        'height': 'label',
+                        'shape': 'roundrectangle',
+                        'padding': '10px'
                     }
                 },
                 {
@@ -68,7 +72,7 @@ class StateGraphView {
             data: { 
                 id: `state${stateId}`, 
                 label, 
-                color: stateId === this.currentStateId ? 'green' : 'white',
+                color: stateId === this.currentStateId ? '#90ee90' : '#d3d3d3', // Light green for current state, light gray for others
                 borderStyle: this.exploredStates.has(stateId) ? 'solid' : 'dashed'
             }
         });
@@ -102,34 +106,33 @@ class StateGraphView {
             this.exploreState(stateId);
         }
         this.cy.nodes().forEach(node => {
-            node.data('color', node.id() === `state${stateId}` ? 'green' : '#11479e');
+            node.data('color', node.id() === `state${stateId}` ? '#90ee90' : '#d3d3d3'); // Light green for current state, light gray for others
         });
     }
 
     exploreState(stateId) {
-    if (this.exploredStates.has(stateId)) return;
-    
-    this.exploredStates.add(stateId);
-    const state = this.stateGraph.getState(stateId); // Retrieve the actual state vector
-    const enabledTransitions = this.sharedState.petriNet.getEnabledTransitions(state);
-    
-    enabledTransitions.forEach(transitionId => {
-        const successorState = this.sharedState.petriNet.fireTransition(state, transitionId);
-        const nbstates = this.stateGraph.listAllStates().length;
-        const successorStateId = this.stateGraph.getId(successorState);
-        if (this.stateGraph.getId(successorState) === nbstates) {
-            this.addState(successorState);
-        }
-        this.addTransition(stateId, successorStateId, transitionId);
-        if (!this.cy.getElementById(`state${successorStateId}`).length) {
-            this.addState(successorState);
-        }
-    });
-    
-    const stateLabel = this.stateGraph.getStateLabel(stateId);
-    this.updateStateNode(stateId, stateLabel, 'solid');
-}
-
+        if (this.exploredStates.has(stateId)) return;
+        
+        this.exploredStates.add(stateId);
+        const state = this.stateGraph.getState(stateId); // Retrieve the actual state vector
+        const enabledTransitions = this.sharedState.petriNet.getEnabledTransitions(state);
+        
+        enabledTransitions.forEach(transitionId => {
+            const successorState = this.sharedState.petriNet.fireTransition(state, transitionId);
+            const nbstates = this.stateGraph.listAllStates().length;
+            const successorStateId = this.stateGraph.getId(successorState);
+            if (this.stateGraph.getId(successorState) === nbstates) {
+                this.addState(successorState);
+            }
+            this.addTransition(stateId, successorStateId, transitionId);
+            if (!this.cy.getElementById(`state${successorStateId}`).length) {
+                this.addState(successorState);
+            }
+        });
+        
+        const stateLabel = this.stateGraph.getStateLabel(stateId);
+        this.updateStateNode(stateId, stateLabel, 'solid');
+    }
 
     updateStateNode(stateId, label, borderStyle) {
         const node = this.cy.getElementById(`state${stateId}`);
@@ -140,11 +143,10 @@ class StateGraphView {
     }
     
     clear() {
-    this.stateGraph = new StateGraph(this.sharedState.petriNet);
-    this.exploredStates = new Set();
-    this.cy.elements().remove();
+        this.stateGraph = new StateGraph(this.sharedState.petriNet);
+        this.exploredStates = new Set();
+        this.cy.elements().remove();
     }
-
 }
 
 export default StateGraphView;
