@@ -8,7 +8,7 @@ import StateGraphView from './stateGraphView.js';
 export default class SimulationMode extends AbstractMode {
     constructor(sharedState, stateGraphView) {
         super(sharedState, 'simulation-cy');
-        this.stateGraphView = new StateGraphView('state-graph-cy', this.sharedState.petriNet);
+        this.stateGraphView = new StateGraphView('state-graph-cy', this.sharedState);
         this.currentState = this.sharedState.petriNet.initialState.slice();
         this.currentEnabled = [];
         this.trace = new Trace();

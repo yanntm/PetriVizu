@@ -4,12 +4,15 @@ import cytoscape from 'cytoscape';
 import StateGraph from './stateGraph';
 
 class StateGraphView {
-    constructor(containerId, petriNet) {
+    constructor(containerId, sharedState) {
         this.stateGraph = new StateGraph();
-        this.petriNet = petriNet;
+        this.sharedState = sharedState;
         this.cy = this.initCytoscape(containerId);
         this.exploredStates = new Set(); // Set to track explored states
         this.currentStateId = null; // Track the current state ID
+
+        // Initialize the layout control
+        this.initializeLayoutControl();
     }
 
     initCytoscape(containerId) {
@@ -46,6 +49,17 @@ class StateGraphView {
         });
     }
 
+    initializeLayoutControl() {
+        const layoutDropdown = document.getElementById('layout-dropdown');
+        layoutDropdown.addEventListener('change', () => {
+            this.applyLayout(layoutDropdown.value);
+        });
+    }
+
+    applyLayout(layoutName) {
+        this.cy.layout({ name: layoutName, padding: 10 }).run();
+    }
+
     addState(state) {
         const stateId = this.stateGraph.getId(state);
         const label = this.stateGraph.getStateLabel(stateId);
@@ -58,6 +72,7 @@ class StateGraphView {
                 borderStyle: this.exploredStates.has(stateId) ? 'solid' : 'dashed'
             }
         });
+        this.applyLayout(document.getElementById('layout-dropdown').value); // Apply layout after adding state
     }
 
     addTransition(sourceId, destinationId, transitionId) {
@@ -71,6 +86,7 @@ class StateGraphView {
                 label: transitionId
             }
         });
+        this.applyLayout(document.getElementById('layout-dropdown').value); // Apply layout after adding transition
     }
 
     updateCurrentState(state) {
@@ -96,10 +112,10 @@ class StateGraphView {
         this.exploredStates.add(stateId);
         const stateLabel = this.stateGraph.getStateLabel(stateId);
         const state = JSON.parse(stateLabel); // Convert label back to state object
-        const enabledTransitions = this.petriNet.getEnabledTransitions(state);
+        const enabledTransitions = this.sharedState.petriNet.getEnabledTransitions(state);
         
         enabledTransitions.forEach(transitionId => {
-            const successorState = this.petriNet.fireTransition(state, transitionId);
+            const successorState = this.sharedState.petriNet.fireTransition(state, transitionId);
             const nbstates = this.stateGraph.listAllStates().length;
             const successorStateId = this.stateGraph.getId(successorState);
             if (this.stateGraph.getId(successorState) === nbstates) {
