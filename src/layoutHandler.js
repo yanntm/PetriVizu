@@ -8,10 +8,10 @@ cytoscape.use(fcose);
 cytoscape.use(dagre);
 
 const layouts = [
+    { name: 'fcose', description: 'fCoSE (Fast CoSE)' },
     { name: 'cose', description: 'CoSE (Clustered Spring Embedder)' },
     { name: 'dagre', description: 'Dagre (DAG Layout)' },
     { name: 'cose-bilkent', description: 'CoSE Bilkent (Improved CoSE)' },
-    { name: 'fcose', description: 'fCoSE (Fast CoSE)' },
     { name: 'circle', description: 'Circle Layout' },
     { name: 'grid', description: 'Grid Layout' },
     { name: 'random', description: 'Random Layout' },

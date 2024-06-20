@@ -28,6 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Ensure the viewer tab is visible by default
     switchTab('viewer');
+    const layoutDropdown = document.getElementById('layout-dropdown');
+    const selectedLayout = layoutDropdown.value;
+    viewMode.layout(selectedLayout);
 });
 
 function switchTab(tabName) {

@@ -16,7 +16,7 @@ export default class ViewMode extends AbstractMode {
     }
 
     activate() {
-        updateCytoscapeCommon(this.cy, this.sharedState.petriNet, true);
+        updateCytoscapeCommon(this.cy, this.sharedState.petriNet, false);
         this.cy.fit();
     }
 
@@ -38,6 +38,11 @@ export default class ViewMode extends AbstractMode {
                 const content = e.target.result;
                 this.sharedState.petriNet = loadPetriNet(content);
                 updateCytoscapeCommon(this.cy, this.sharedState.petriNet);
+                            // Apply the current layout and fit the graph
+              const layoutDropdown = document.getElementById('layout-dropdown');
+              const selectedLayout = layoutDropdown.value;
+              this.layout(selectedLayout); // Apply the selected layout and fit the graph
+                this.cy.fit();
             };
             reader.readAsText(file);
         }
