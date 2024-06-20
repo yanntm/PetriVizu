@@ -99,58 +99,69 @@ export default class EditMode extends AbstractMode {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
-  handleTapEvent(event) {
+// editMode.js
+
+handleTapEvent(event) {
     const target = event.target;
     if (this.currentTool === 'editText') {
-      console.log('Edit Text Tool - Target:', target.data());
-      if (target.isEdge()) {
-        const currentLabel = target.data('label') || '1';
-        const newLabel = prompt("Enter new weight:", currentLabel);
-        if (newLabel !== null) {
-          const sourceNode = this.cy.getElementById(target.data('source'));
-          const targetNode = this.cy.getElementById(target.data('target'));
-          const sourceLabel = sourceNode.data('label').split('\n')[0];
-          const targetLabel = targetNode.data('label').split('\n')[0];
-          this.sharedState.petriNet.updateWeight(sourceLabel, targetLabel, parseInt(newLabel));
-          target.data('label', newLabel);
+        console.log('Edit Text Tool - Target:', target.data());
+        if (target.isEdge()) {
+            const currentLabel = target.data('label') || '1';
+            const newLabel = prompt("Enter new weight:", currentLabel);
+            if (newLabel !== null) {
+                const sourceNode = this.cy.getElementById(target.data('source'));
+                const targetNode = this.cy.getElementById(target.data('target'));
+                const sourceLabel = sourceNode.data('label').split('\n')[0];
+                const targetLabel = targetNode.data('label').split('\n')[0];
+                this.sharedState.petriNet.updateWeight(sourceLabel, targetLabel, parseInt(newLabel));
+                target.data('label', newLabel);
+            }
+        } else {
+            const labelParts = target.data('label').split('\n');
+            const name = labelParts[0];
+            const marking = labelParts[1] || '';
+            const newName = prompt("Enter new name:", name);
+            const newMarking = target.hasClass('place') ? prompt("Enter new marking:", marking) : marking;
+            if (newName !== null) {
+                let success = false;
+                if (target.hasClass('place')) {
+                    success = this.sharedState.petriNet.renamePlace(name, newName);
+                    if (success) {
+                        this.sharedState.petriNet.updateInitialState(newName, parseInt(newMarking));
+                        target.data('label', `${newName}\n${newMarking}`);
+                    }
+                } else if (target.hasClass('transition')) {
+                    success = this.sharedState.petriNet.renameTransition(name, newName);
+                    if (success) {
+                        target.data('label', newName);
+                    }
+                }
+                if (!success) {
+                    alert("Name already used.");
+                }
+            }
         }
-      } else {
-        const labelParts = target.data('label').split('\n');
-        const name = labelParts[0];
-        const marking = labelParts[1] || '';
-        const newName = prompt("Enter new name:", name);
-        const newMarking = target.hasClass('place') ? prompt("Enter new marking:", marking) : marking;
-        if (newName !== null) {
-          if (target.hasClass('place')) {
-            this.sharedState.petriNet.renamePlace(name, newName);
-            this.sharedState.petriNet.updateInitialState(newName, parseInt(newMarking));
-            target.data('label', `${newName}\n${newMarking}`);
-          } else if (target.hasClass('transition')) {
-            this.sharedState.petriNet.renameTransition(name, newName);
-            target.data('label', newName);
-          }
-        }
-      }
     } else if (this.currentTool === 'delete') {
-      if (target.isEdge()) {
-        const sourceNode = this.cy.getElementById(target.data('source'));
-        const targetNode = this.cy.getElementById(target.data('target'));
-        const sourceLabel = sourceNode.data('label').split('\n')[0];
-        const targetLabel = targetNode.data('label').split('\n')[0];
-        this.sharedState.petriNet.deleteArc(sourceLabel, targetLabel);
-        target.remove();
-      } else {
-        const labelParts = target.data('label').split('\n');
-        const name = labelParts[0];
-        if (target.hasClass('place')) {
-          this.sharedState.petriNet.deletePlace(name);
-        } else if (target.hasClass('transition')) {
-          this.sharedState.petriNet.deleteTransition(name);
+        if (target.isEdge()) {
+            const sourceNode = this.cy.getElementById(target.data('source'));
+            const targetNode = this.cy.getElementById(target.data('target'));
+            const sourceLabel = sourceNode.data('label').split('\n')[0];
+            const targetLabel = targetNode.data('label').split('\n')[0];
+            this.sharedState.petriNet.deleteArc(sourceLabel, targetLabel);
+            target.remove();
+        } else {
+            const labelParts = target.data('label').split('\n');
+            const name = labelParts[0];
+            if (target.hasClass('place')) {
+                this.sharedState.petriNet.deletePlace(name);
+            } else if (target.hasClass('transition')) {
+                this.sharedState.petriNet.deleteTransition(name);
+            }
+            target.remove();
         }
-        target.remove();
-      }
     }
-  }
+}
+
 
   handleCanvasClick(event) {
     if (event.target === this.cy) {

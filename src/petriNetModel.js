@@ -42,21 +42,33 @@ class PetriNet {
 
   }
 
-  renamePlace(oldId, newId) {
-    if (!this.places.has(oldId)) throw new Error(`Place ${oldId} does not exist.`);
+renamePlace(oldId, newId) {
+    if (this.places.has(newId)) {
+        return false; // Name already used
+    }
+    if (!this.places.has(oldId)) {
+        throw new Error(`Place ${oldId} does not exist.`);
+    }
     const index = this.places.get(oldId);
     this.places.delete(oldId);
     this.places.set(newId, index);
     this.reversePlaces[index] = newId;
-  }
+    return true;
+}
 
-  renameTransition(oldId, newId) {
-    if (!this.transitions.has(oldId)) throw new Error(`Transition ${oldId} does not exist.`);
+renameTransition(oldId, newId) {
+    if (this.transitions.has(newId)) {
+        return false; // Name already used
+    }
+    if (!this.transitions.has(oldId)) {
+        throw new Error(`Transition ${oldId} does not exist.`);
+    }
     const index = this.transitions.get(oldId);
     this.transitions.delete(oldId);
     this.transitions.set(newId, index);
     this.reverseTransitions[index] = newId;
-  }
+    return true;
+}
 
   updateWeight(source, target, newWeight) {
     const sourceIndex = this.places.has(source) ? this.places.get(source) : this.transitions.get(source);
