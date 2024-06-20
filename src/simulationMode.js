@@ -16,6 +16,7 @@ export default class SimulationMode extends AbstractMode {
     }
 
     activate() {
+        this.stateGraphView.clear();
         this.currentState = this.sharedState.petriNet.initialState.slice();
         updateCytoscapeCommon(this.cy, this.sharedState.petriNet, true);
         this.updateCytoShownState();
@@ -114,7 +115,6 @@ export default class SimulationMode extends AbstractMode {
     resetSimulation() {
         this.currentState = this.sharedState.petriNet.initialState.slice();
         this.trace.clear();
-        this.stateGraphView = new StateGraphView('stateGraphContainer', this.sharedState.petriNet); // Reinitialize state graph view
         this.stateGraphView.updateCurrentState(this.currentState);
         this.updateCytoShownState();
         this.updateEnabled();

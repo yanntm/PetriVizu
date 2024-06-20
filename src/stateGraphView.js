@@ -137,6 +137,13 @@ class StateGraphView {
             node.data('borderStyle', borderStyle);
         }
     }
+    
+    clear() {
+    this.stateGraph = new StateGraph();
+    this.exploredStates = new Set();
+    this.cy.elements().remove();
+    }
+
 }
 
 export default StateGraphView;
