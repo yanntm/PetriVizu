@@ -64,20 +64,25 @@ class StateGraphView {
         this.cy.layout({ name: layoutName, padding: 10 }).run();
     }
 
-    addState(state) {
-        const stateId = this.stateGraph.getId(state);
-        const label = this.stateGraph.getStateLabel(stateId);
-        this.cy.add({
-            group: 'nodes',
-            data: { 
-                id: `state${stateId}`, 
-                label, 
-                color: stateId === this.currentStateId ? '#90ee90' : '#d3d3d3', // Light green for current state, light gray for others
-                borderStyle: this.exploredStates.has(stateId) ? 'solid' : 'dashed'
-            }
-        });
-        this.applyLayout(document.getElementById('layout-dropdown').value); // Apply layout after adding state
-    }
+addState(state) {
+    const stateId = this.stateGraph.getId(state);
+    const label = this.stateGraph.getStateLabel(stateId);
+    this.cy.add({
+        group: 'nodes',
+        data: { 
+            id: `state${stateId}`, 
+            label, 
+            color: stateId === this.currentStateId ? '#90ee90' : '#d3d3d3', // Light green for current state, light gray for others
+            borderStyle: this.exploredStates.has(stateId) ? 'solid' : 'dashed',
+            borderColor: stateId === this.stateGraph.getInitialStateId() ? 'blue' : 'black' // Blue border for initial state
+        },
+        style: {
+            'border-color': stateId === this.stateGraph.getInitialStateId() ? 'blue' : 'black'
+        }
+    });
+    this.applyLayout(document.getElementById('layout-dropdown').value); // Apply layout after adding state
+}
+
 
     addTransition(sourceId, destinationId, transitionId) {
         this.stateGraph.addEdge(sourceId, destinationId, transitionId);
