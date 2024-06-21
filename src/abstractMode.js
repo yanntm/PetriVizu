@@ -17,15 +17,19 @@ export default class AbstractMode {
         return cytoscape({
             container: document.getElementById(containerId),
             style: cytoscapeStyles,
-            layout: { name: 'preset', padding: 10 }
+            layout: { name: 'fcose', padding: 10 }
         });
     }
 
-    layout(layoutName) {
-        this.cy.layout({ name: layoutName, padding: 10 }).run().promiseOn('layoutstop').then(() => {
+// abstractMode.js
+layout(layoutName) {
+    const layout = this.cy.layout({ name: layoutName, padding: 10 });
+    layout.run();
+    layout.promiseOn('layoutstop').then(() => {
             this.cy.fit();
-        });
-    }
+    });
+}
+
 
     activate() {
         throw new Error('Method not implemented.');

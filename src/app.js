@@ -16,7 +16,7 @@ const layoutHandler = new LayoutHandler();
 
 document.addEventListener('DOMContentLoaded', () => {
     currentMode = viewMode;
-    currentMode.activate();
+    
     layoutHandler.setCurrentMode(currentMode);
 
     document.querySelectorAll('.tab-button').forEach(button => {
@@ -28,9 +28,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Ensure the viewer tab is visible by default
     switchTab('viewer');
-    const layoutDropdown = document.getElementById('layout-dropdown');
-    const selectedLayout = layoutDropdown.value;
-    viewMode.layout(selectedLayout);
+    
+  requestAnimationFrame(() => {
+    viewMode.activate();
+    viewMode.layout('cose');
+  });
+    
 });
 
 function switchTab(tabName) {
@@ -47,8 +50,12 @@ function switchTab(tabName) {
     }
 
     updateTabContent(tabName);
-    currentMode.activate();
-    layoutHandler.setCurrentMode(currentMode);
+    
+    // Delay activation until after the tab content update is finished
+    requestAnimationFrame(() => {
+        layoutHandler.setCurrentMode(currentMode);
+        currentMode.activate();        
+    });
 }
 
 function updateTabContent(tabName) {

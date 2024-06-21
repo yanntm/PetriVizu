@@ -65,6 +65,12 @@ class StateGraphView {
 
     applyLayout(layoutName) {
         this.cy.layout({ name: layoutName, padding: 10 }).run();
+        requestAnimationFrame(() => {
+          this.cy.fit();
+        });
+      this.cy.on('layoutstop', function(){
+        this.cy.fit();
+      });
     }
 
     setupClickListener() {

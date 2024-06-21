@@ -18,7 +18,12 @@ export default class EditMode extends AbstractMode {
 
     activate() {
         updateCytoscapeCommon(this.cy, this.sharedState.petriNet, true);
+        requestAnimationFrame(() => {
+          this.cy.fit();
+         });
+         this.cy.on('layoutstop', function(){
         this.cy.fit();
+      });        
     }
 
     setupEdgehandles() {

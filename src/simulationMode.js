@@ -26,6 +26,11 @@ export default class SimulationMode extends AbstractMode {
         this.updateTraceDisplay();
         this.stateGraphView.updateCurrentState(this.currentState); // Update state graph view
         this.cy.fit();
+        
+        requestAnimationFrame(() => {
+          this.cy.fit();
+          this.stateGraphView.applyLayout();
+         }); 
     }
 
     setupEventListeners() {
