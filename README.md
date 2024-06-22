@@ -4,7 +4,7 @@ A Petri net visualization and simulation tool in your browser.
 
 Available here : https://yanntm.github.io/PetriVizu
 
-Features currently include loading nets from PNML, visualizing them with some layout helpers, editing nets. Export and simulation mode forthcoming.
+Features currently include loading nets from PNML, visualizing them with some layout helpers, editing nets, export to PNML, interactive simulation and reachability graph exploration, and analysis using state of the art Model-Checking contest compliant tools.
 
 ### Building the Project
 
@@ -25,18 +25,10 @@ To run the local server:
 npm start
 ```
 
-By default, the server will run on port 1664. You can specify a different port by providing it as an argument:
-
-```bash
-node runServer.py 8080
-```
-
 ## Integration with MCC-server
 
-To perform model-checking analyses, deploy and run the [MCC-server](https://github.com/yanntm/MCC-server) Docker container:
+To perform model-checking analyses, deploy and run the [MCC-server](https://github.com/yanntm/MCC-server) Docker container.
 
-```bash
-docker run -d -p 5000:5000 mcc-server
-```
+PetriVizu tries to connect to a server running on localhost; so you must first start the mcc-server to benefit from the analysis mode.
 
 For more details, visit the [MCC-server repository](https://github.com/yanntm/MCC-server).
