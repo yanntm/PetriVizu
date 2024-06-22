@@ -62,16 +62,16 @@
         <div id="analysis-controls">
             <label for="examination-selector">Select Examination:</label>
             <select id="examination-selector"></select>
-    
+        
             <label for="tool-selector">Select Tool:</label>
             <select id="tool-selector"></select>
-    
+        
             <label for="apply-reductions">Apply Reductions:</label>
             <input type="checkbox" id="apply-reductions">
-    
+        
             <label for="timeout">Timeout (seconds):</label>
             <input type="number" id="timeout" value="100">
-    
+        
             <button id="run-analysis" title="Run Analysis">Run Analysis</button>
         </div>
         <div id="output-wrapper" title="Output">
@@ -82,6 +82,25 @@
         </div>
     </div>
 
+    <div id="property" class="tab-content" style="display:none;"> <!-- New Property tab content -->
+        <div id="property-controls">
+          <button id="save-property" title="Save Property">Save Property</button>
+            <button id="add-property" title="Add Property">Add Property</button>
+            <button id="remove-property" title="Remove Property">Remove Property</button>
+        </div>
+        <div id="property-list">
+            <!-- List of properties will be shown here -->
+        </div>
+        <div id="property-configuration" style="display:none;">
+            <!-- Property configuration form will be shown here -->
+        </div>
+        <div id="property-result" style="display:none;">
+            <h3>Standard Output (stdout)</h3>
+            <textarea id="property-stdout" readonly></textarea>
+            <h3>Error Output (stderr)</h3>
+            <textarea id="property-stderr" readonly></textarea>
+        </div>
+    </div>
 
 
 </body>

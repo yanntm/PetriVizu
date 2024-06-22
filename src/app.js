@@ -2,6 +2,7 @@ import ViewMode from './viewMode.js';
 import EditMode from './editMode.js';
 import SimulationMode from './simulationMode.js';
 import AnalysisMode from './analysisMode.js';
+import PropertyMode from './propertyMode.js'; // Import PropertyMode
 import { buildExample } from './example.js';
 import LayoutHandler from './layoutHandler.js';
 
@@ -14,6 +15,7 @@ const viewMode = new ViewMode(sharedState);
 const editMode = new EditMode(sharedState);
 const simulationMode = new SimulationMode(sharedState);
 const analysisMode = new AnalysisMode(sharedState);
+const propertyMode = new PropertyMode(sharedState); // Instantiate PropertyMode
 const layoutHandler = new LayoutHandler();
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -50,7 +52,9 @@ function switchTab(tabName) {
     } else if (tabName === 'simulation') {
         currentMode = simulationMode;
     } else if (tabName === 'analysis') {
-        currentMode = analysisMode;      
+        currentMode = analysisMode;
+    } else if (tabName === 'property') {
+        currentMode = propertyMode; // Activate PropertyMode
     }
     
     requestAnimationFrame(() => {
