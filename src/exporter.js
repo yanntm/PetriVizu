@@ -1,7 +1,7 @@
 // exporter.js
 import { PetriNet } from './petriNetModel';
 
-export function exportToPNML(petriNet) {
+export function exportToPNMLContent(petriNet) {
     const xmlParts = [];
 
     xmlParts.push('<?xml version="1.0" encoding="utf-8"?>');
@@ -39,7 +39,11 @@ export function exportToPNML(petriNet) {
     xmlParts.push('</net>');
     xmlParts.push('</pnml>');
 
-    const xmlContent = xmlParts.join('\n');
+    return xmlParts.join('\n');
+}
+
+export function exportToPNML(petriNet) {
+    const xmlContent = exportToPNMLContent(petriNet);
     downloadPNML(xmlContent);
 }
 

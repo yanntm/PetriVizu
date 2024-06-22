@@ -1,6 +1,7 @@
 import ViewMode from './viewMode.js';
 import EditMode from './editMode.js';
 import SimulationMode from './simulationMode.js';
+import AnalysisMode from './analysisMode.js';
 import { buildExample } from './example.js';
 import LayoutHandler from './layoutHandler.js';
 
@@ -12,6 +13,7 @@ const sharedState = {
 const viewMode = new ViewMode(sharedState);
 const editMode = new EditMode(sharedState);
 const simulationMode = new SimulationMode(sharedState);
+const analysisMode = new AnalysisMode(sharedState);
 const layoutHandler = new LayoutHandler();
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -29,17 +31,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // Ensure the viewer tab is visible by default
     switchTab('viewer');
     
-  requestAnimationFrame(() => {
-    viewMode.activate();
-    viewMode.layout('cose');
-  });
-    
+    requestAnimationFrame(() => {
+        viewMode.activate();
+        viewMode.layout('cose');
+    });
 });
 
 function switchTab(tabName) {
     if (currentMode) {
         currentMode.deactivate();
     }
+    updateTabContent(tabName);
 
     if (tabName === 'editor') {
         currentMode = editMode;
@@ -47,11 +49,11 @@ function switchTab(tabName) {
         currentMode = viewMode;
     } else if (tabName === 'simulation') {
         currentMode = simulationMode;
+    } else if (tabName === 'analysis') {
+        currentMode = analysisMode;
+        return;
     }
-
-    updateTabContent(tabName);
     
-    // Delay activation until after the tab content update is finished
     requestAnimationFrame(() => {
         layoutHandler.setCurrentMode(currentMode);
         currentMode.activate();        

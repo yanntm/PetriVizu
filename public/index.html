@@ -13,6 +13,7 @@
             <button class="tab-button" data-tab="viewer">Viewer</button>
             <button class="tab-button" data-tab="editor">Editor</button>
             <button class="tab-button" data-tab="simulation">Simulation</button>
+            <button class="tab-button" data-tab="analysis">Analysis</button>
         </div>
         <div id="layout-tools">
             <button id="fit-button" title="Fit the graph to view">Fit</button>
@@ -54,6 +55,17 @@
             </div>
             <div id="state-graph-cy-container">
                 <div id="state-graph-cy"></div>
+            </div>
+        </div>
+    </div>
+    <div id="analysis" class="tab-content" style="display:none;">
+        <div id="analysis-controls">
+            <button id="run-analysis" title="Run Analysis">Run Analysis</button>
+            <div id="output-wrapper" title="Output">
+                <h3>Standard Output (stdout)</h3>
+                <textarea id="stdout" readonly></textarea>
+                <h3>Error Output (stderr)</h3>
+                <textarea id="stderr" readonly></textarea>
             </div>
         </div>
     </div>
