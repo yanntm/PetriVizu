@@ -50,8 +50,7 @@ function switchTab(tabName) {
     } else if (tabName === 'simulation') {
         currentMode = simulationMode;
     } else if (tabName === 'analysis') {
-        currentMode = analysisMode;
-        return;
+        currentMode = analysisMode;      
     }
     
     requestAnimationFrame(() => {
