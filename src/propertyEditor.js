@@ -1,4 +1,4 @@
-import { fetchExaminationToolMap } from './serverCommunicator.js';
+import { fetchExaminationToolMap, serverHelp } from './serverCommunicator.js';
 import { PropertyDefinition } from './propertyDefinition.js';
 
 const EXAMINATIONS_WITHOUT_XML = ["StateSpace", "OneSafe", "StableMarking", "QuasiLiveness", "Liveness", "ReachabilityDeadlock"];
@@ -16,8 +16,12 @@ export default class PropertyEditor {
     }
 
     async init() {
-        this.examinationToolMap = await fetchExaminationToolMap();
-        this.populateExaminations();
+        try {
+            this.examinationToolMap = await fetchExaminationToolMap();
+            this.populateExaminations();
+        } catch (error) {
+            this.handleError(error);
+        }
     }
 
     setupEditorControls() {
@@ -67,6 +71,13 @@ export default class PropertyEditor {
                 toolSelector.appendChild(option);
             });
         }
+    }
+
+    handleError(error) {
+        const stderrElem = document.getElementById('stderr');
+        stderrElem.value = serverHelp();
+        alert(serverHelp());
+        console.error('Error:', error);
     }
 
     activate() {
