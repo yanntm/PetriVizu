@@ -1,6 +1,5 @@
 import { PropertyResult } from './propertyResultModel.js';
-import { runAnalysis } from './serverCommunicator.js';
-import { exportToPNMLContent } from './exporter.js';
+import { runAnalysis, serverHelp } from './serverCommunicator.js';
 
 export default class PropertyResultViewer {
     constructor(sharedState) {
@@ -11,7 +10,7 @@ export default class PropertyResultViewer {
     }
 
     setupRunAnalysis() {
-        document.getElementById('run-analysis').addEventListener('click', () => {
+        document.getElementById('run-analysis').addEventListener('click', async () => {
             const examinationSelector = document.getElementById('examination-selector');
             const selectedExamination = examinationSelector.value;
             const toolSelector = document.getElementById('tool-selector');
@@ -23,24 +22,19 @@ export default class PropertyResultViewer {
                 selectedTool += 'xred';
             }
 
-            const property = {
-                examination: selectedExamination,
-                tool: selectedTool,
-                timeout: timeout
-            };
-
-            this.runAnalysis(property);
+            try {
+                await runAnalysis(this.sharedState.petriNet, selectedExamination, selectedTool, timeout, this.result);
+            } catch (error) {
+                this.handleError(error);
+            }
         });
     }
 
-    runAnalysis(property) {
-        const pnmlContent = exportToPNMLContent(this.sharedState.petriNet);
-
-        const formData = new FormData();
-        const blob = new Blob([pnmlContent], { type: 'application/xml' });
-        formData.append('model.pnml', blob, 'model.pnml');
-
-        runAnalysis(formData, property.examination, property.tool, this.result);
+    handleError(error) {
+        const stderrElem = this.result.stderrElem;
+        stderrElem.value = serverHelp();
+        alert(serverHelp());
+        console.error('Error:', error);
     }
 
     activate() {
