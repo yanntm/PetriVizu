@@ -224,8 +224,8 @@ renameTransition(oldId, newId) {
         const Pperm = computePermutation(placeIds);
         const Tperm = computePermutation(transitionIds);
 
-        console.log('Original Place IDs:', placeIds);
-        console.log('Permutation:', Pperm);
+        //console.log('Original Place IDs:', placeIds);
+        //console.log('Permutation:', Pperm);
 
         // Reorder places
         const newPlaces = new Map();
@@ -243,7 +243,7 @@ renameTransition(oldId, newId) {
         this.reversePlaces = newReversePlaces;
         this.initialState = newInitialState;
 
-        console.log('Final ids:', this.reversePlaces);
+        // console.log('Final ids:', this.reversePlaces);
 
         // Reorder transitions
         const newTransitions = new Map();
