@@ -25,6 +25,11 @@ export default class EditMode extends AbstractMode {
         this.cy.fit();
       });        
     }
+    
+    deactivate() {
+      this.sharedState.petriNet.reorder(); // Reorder places and transitions
+      super.deactivate();
+    }
 
     setupEdgehandles() {
         this.eh = this.cy.edgehandles({

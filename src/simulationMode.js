@@ -29,7 +29,7 @@ export default class SimulationMode extends AbstractMode {
         
         requestAnimationFrame(() => {
           this.cy.fit();
-          this.stateGraphView.applyLayout();
+          this.stateGraphView.applyLayout('dagre');
          }); 
     }
 
@@ -76,17 +76,19 @@ export default class SimulationMode extends AbstractMode {
         this.currentEnabled = this.sharedState.petriNet.getEnabledTransitions(this.currentState);
         const enabledTransitionsDiv = document.getElementById('enabled-transitions');
         enabledTransitionsDiv.innerHTML = "";
-
-        this.currentEnabled.forEach(transitionId => {
-            const transitionItem = document.createElement('div');
-            transitionItem.innerText = transitionId;
-            transitionItem.style.cursor = 'pointer';
-            transitionItem.addEventListener('click', () => {
-                this.fireTransition(transitionId);
-            });
-            enabledTransitionsDiv.appendChild(transitionItem);
+    
+        this.sharedState.petriNet.reverseTransitions.forEach(transitionId => {
+            if (this.currentEnabled.includes(transitionId)) {
+                const transitionItem = document.createElement('div');
+                transitionItem.innerText = transitionId;
+                transitionItem.style.cursor = 'pointer';
+                transitionItem.addEventListener('click', () => {
+                    this.fireTransition(transitionId);
+                });
+                enabledTransitionsDiv.appendChild(transitionItem);
+            }
         });
-
+    
         this.cy.nodes().forEach(node => {
             if (node.hasClass('transition')) {
                 if (this.currentEnabled.includes(node.id())) {
@@ -97,15 +99,18 @@ export default class SimulationMode extends AbstractMode {
             }
         });
     }
-
+    
+    
     updateCurrentStateDisplay() {
         const currentStateTextarea = document.getElementById('current-state');
         let stateText = "";
-        this.sharedState.petriNet.places.forEach((index, placeId) => {
-            stateText += `${placeId}: ${this.currentState[index]}\n`;
+        this.sharedState.petriNet.reversePlaces.forEach(placeId => {
+            const placeIndex = this.sharedState.petriNet.places.get(placeId);
+            stateText += `${placeId}: ${this.currentState[placeIndex]}\n`;
         });
         currentStateTextarea.value = stateText;
     }
+
 
     updateTraceDisplay() {
         const traceDiv = document.getElementById('trace');

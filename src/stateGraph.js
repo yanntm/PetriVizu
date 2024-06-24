@@ -25,14 +25,16 @@ class StateGraph {
 
     computeLabel(state) {
         let label = [];
-        this.petriNet.places.forEach((index, placeId) => {
-            const tokenCount = state[index];
+        this.petriNet.reversePlaces.forEach(placeId => {
+            const placeIndex = this.petriNet.places.get(placeId);
+            const tokenCount = state[placeIndex];
             if (tokenCount > 0) {
                 label.push(tokenCount === 1 ? placeId : `${placeId}(${tokenCount})`);
             }
         });
         return label.join(',');
     }
+
 
     addEdge(sourceId, destinationId, transitionId) {
         this.successors[sourceId].push({ target: destinationId, transition: transitionId });

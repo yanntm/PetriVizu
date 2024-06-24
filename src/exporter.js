@@ -3,6 +3,7 @@ import { PetriNet } from './petriNetModel';
 
 export function exportToPNMLContent(petriNet) {
     const xmlParts = [];
+    let arcIndex = 0; // Initialize arc index counter
 
     xmlParts.push('<?xml version="1.0" encoding="utf-8"?>');
     xmlParts.push('<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">');
@@ -10,7 +11,9 @@ export function exportToPNMLContent(petriNet) {
     xmlParts.push('<page id="page0">');
     xmlParts.push('<name><text>DefaultPage</text></name>');
 
-    petriNet.places.forEach((index, id) => {
+    // Export places in the order defined by reversePlaces
+    petriNet.reversePlaces.forEach(id => {
+        const index = petriNet.places.get(id);
         const tokens = petriNet.initialState[index];
         xmlParts.push(`<place id="${id}">`);
         xmlParts.push(`<name><text>${id}</text></name>`);
@@ -20,18 +23,30 @@ export function exportToPNMLContent(petriNet) {
         xmlParts.push('</place>');
     });
 
-    petriNet.transitions.forEach((index, id) => {
+    // Export transitions and their related arcs in the order defined by reverseTransitions
+    petriNet.reverseTransitions.forEach(id => {
+        const index = petriNet.transitions.get(id);
         xmlParts.push(`<transition id="${id}">`);
         xmlParts.push(`<name><text>${id}</text></name>`);
         xmlParts.push('</transition>');
-    });
 
-    petriNet.getArcs().forEach(([sourceId, targetId, weight], index) => {
-        xmlParts.push(`<arc id="arc${index}" source="${sourceId}" target="${targetId}">`);
-        if (weight > 1) {
-            xmlParts.push(`<inscription><text>${weight}</text></inscription>`);
-        }
-        xmlParts.push('</arc>');
+        // Export arcs related to this transition
+        petriNet.pre[index].forEach(([placeIndex, weight]) => {
+            const placeId = petriNet.reversePlaces[placeIndex];
+            xmlParts.push(`<arc id="a${arcIndex++}" source="${placeId}" target="${id}">`);
+            if (weight > 1) {
+                xmlParts.push(`<inscription><text>${weight}</text></inscription>`);
+            }
+            xmlParts.push('</arc>');
+        });
+        petriNet.post[index].forEach(([placeIndex, weight]) => {
+            const placeId = petriNet.reversePlaces[placeIndex];
+            xmlParts.push(`<arc id="a${arcIndex++}" source="${id}" target="${placeId}">`);
+            if (weight > 1) {
+                xmlParts.push(`<inscription><text>${weight}</text></inscription>`);
+            }
+            xmlParts.push('</arc>');
+        });
     });
 
     xmlParts.push('</page>');

@@ -1,5 +1,35 @@
 import { Graphics } from './graphics.js';
 
+function alphanumericSort(a, b) {
+    const regex = /(.*?)(\d+)?$/;
+    const aMatch = a.match(regex);
+    const bMatch = b.match(regex);
+
+    const aPrefix = aMatch[1] || '';
+    const bPrefix = bMatch[1] || '';
+    const aNumber = aMatch[2] ? parseInt(aMatch[2], 10) : 0;
+    const bNumber = bMatch[2] ? parseInt(bMatch[2], 10) : 0;
+
+    if (aPrefix < bPrefix) return -1;
+    if (aPrefix > bPrefix) return 1;
+    return aNumber - bNumber;
+}
+
+function computePermutation(ids) {
+    // Create a permutation array with the same length as ids
+    const perm = ids.map((id, index) => index);
+
+    // Sort the perm array based on the ids using the alphanumericSort function
+    perm.sort((a, b) => alphanumericSort(ids[a], ids[b]));
+    // Generate the permutation vector
+    const permutation = new Array(perm.length);
+    perm.forEach((sortedIndex, originalIndex) => {
+        permutation[sortedIndex] = originalIndex;
+    });
+    return permutation;
+}
+
+
 class PetriNet {
   constructor() {
     this.places = new Map();
@@ -186,6 +216,56 @@ renameTransition(oldId, newId) {
   getGraphics() {
         return this.graphics;
   }
+  
+    reorder() {
+        // Compute permutations for places and transitions
+        const placeIds = this.reversePlaces.slice();
+        const transitionIds = this.reverseTransitions.slice();
+        const Pperm = computePermutation(placeIds);
+        const Tperm = computePermutation(transitionIds);
+
+        console.log('Original Place IDs:', placeIds);
+        console.log('Permutation:', Pperm);
+
+        // Reorder places
+        const newPlaces = new Map();
+        const newReversePlaces = new Array(this.reversePlaces.length);
+        const newInitialState = new Array(this.initialState.length);
+
+        Pperm.forEach((newIndex, oldIndex) => {
+            const id = this.reversePlaces[oldIndex];
+            newPlaces.set(id, newIndex);
+            newReversePlaces[newIndex] = id;
+            newInitialState[newIndex] = this.initialState[oldIndex];
+        });
+
+        this.places = newPlaces;
+        this.reversePlaces = newReversePlaces;
+        this.initialState = newInitialState;
+
+        console.log('Final ids:', this.reversePlaces);
+
+        // Reorder transitions
+        const newTransitions = new Map();
+        const newReverseTransitions = new Array(this.reverseTransitions.length);
+        const newPre = new Array(this.pre.length);
+        const newPost = new Array(this.post.length);
+
+        Tperm.forEach((newIndex, oldIndex) => {
+            const id = this.reverseTransitions[oldIndex];
+            newTransitions.set(id, newIndex);
+            newReverseTransitions[newIndex] = id;
+            newPre[newIndex] = this.pre[oldIndex].map(([placeIndex, weight]) => [Pperm[placeIndex], weight]);
+            newPost[newIndex] = this.post[oldIndex].map(([placeIndex, weight]) => [Pperm[placeIndex], weight]);
+        });
+
+        this.transitions = newTransitions;
+        this.reverseTransitions = newReverseTransitions;
+        this.pre = newPre;
+        this.post = newPost;
+    }
+
+
 }
 
 export { PetriNet };

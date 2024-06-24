@@ -37,6 +37,7 @@ export default class ViewMode extends AbstractMode {
             reader.onload = (e) => {
                 const content = e.target.result;
                 this.sharedState.petriNet = loadPetriNet(content);
+                this.sharedState.petriNet.reorder();
                 updateCytoscapeCommon(this.cy, this.sharedState.petriNet);
                             // Apply the current layout and fit the graph
               const layoutDropdown = document.getElementById('layout-dropdown');
