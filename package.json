@@ -5,9 +5,10 @@
   "main": "src/app.js",
   "scripts": {
     "start": "webpack serve --open",
-    "build": "npm run clean && npm run copy && webpack",
+    "build": "npm run clean && npm run copy && npm run generate-index && webpack",
     "clean": "rm -rf website",
-    "copy": "mkdir -p website && cp -r public/* website/"
+    "copy": "mkdir -p website && cp -r public/* website/ && cp -r examples website/",
+    "generate-index": "node generateIndex.js"
   },
   "author": "Yann Thierry-Mieg",
   "license": "GPL-3.0-only",

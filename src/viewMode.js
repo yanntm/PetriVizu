@@ -11,8 +11,11 @@ export default class ViewMode extends AbstractMode {
         this.onFileOpenClick = this.onFileOpenClick.bind(this);
         this.onFileInputChange = this.onFileInputChange.bind(this);
         this.onFileExportClick = this.onFileExportClick.bind(this);
+        this.onExampleSelectChange = this.onExampleSelectChange.bind(this);
+        this.loadPNMLContent = this.loadPNMLContent.bind(this);
 
         this.setupFileImport();
+        this.initializeExampleSelect();
     }
 
     activate() {
@@ -24,6 +27,22 @@ export default class ViewMode extends AbstractMode {
         document.getElementById('fileOpen').addEventListener('click', this.onFileOpenClick);
         document.getElementById('fileInput').addEventListener('change', this.onFileInputChange);
         document.getElementById('fileExport').addEventListener('click', this.onFileExportClick);
+        document.getElementById('exampleSelect').addEventListener('change', this.onExampleSelectChange);
+    }
+
+    initializeExampleSelect() {
+        fetch('examples/index.json')
+            .then(response => response.json())
+            .then(files => {
+                const exampleSelect = document.getElementById('exampleSelect');
+                files.forEach(file => {
+                    const option = document.createElement('option');
+                    option.value = file;
+                    option.text = file;
+                    exampleSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error fetching example list:', error));
     }
 
     onFileOpenClick() {
@@ -35,15 +54,7 @@ export default class ViewMode extends AbstractMode {
         if (file) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                const content = e.target.result;
-                this.sharedState.petriNet = loadPetriNet(content);
-                this.sharedState.petriNet.reorder();
-                updateCytoscapeCommon(this.cy, this.sharedState.petriNet);
-                            // Apply the current layout and fit the graph
-              const layoutDropdown = document.getElementById('layout-dropdown');
-              const selectedLayout = layoutDropdown.value;
-              this.layout(selectedLayout); // Apply the selected layout and fit the graph
-                this.cy.fit();
+                this.loadPNMLContent(e.target.result);
             };
             reader.readAsText(file);
         }
@@ -51,5 +62,27 @@ export default class ViewMode extends AbstractMode {
 
     onFileExportClick() {
         exportToPNML(this.sharedState.petriNet);
+    }
+
+    onExampleSelectChange(event) {
+        const selectedFile = event.target.value;
+        if (selectedFile) {
+            fetch(`examples/${selectedFile}`)
+                .then(response => response.text())
+                .then(content => {
+                    this.loadPNMLContent(content);
+                })
+                .catch(error => console.error('Error loading example:', error));
+        }
+    }
+
+    loadPNMLContent(content) {
+        this.sharedState.petriNet = loadPetriNet(content);
+        this.sharedState.petriNet.reorder();
+        updateCytoscapeCommon(this.cy, this.sharedState.petriNet);
+        const layoutDropdown = document.getElementById('layout-dropdown');
+        const selectedLayout = layoutDropdown.value;
+        this.layout(selectedLayout);
+        this.cy.fit();
     }
 }
