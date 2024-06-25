@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+const { execSync } = require('child_process');
 
 module.exports = {
   entry: './src/app.js',
@@ -15,6 +16,10 @@ module.exports = {
         use: {
           loader: 'babel-loader'
         }
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
       }
     ]
   },
@@ -27,6 +32,9 @@ module.exports = {
     open: true
   },
   resolve: {
+    alias: {
+      'monaco-editor': path.resolve(__dirname, 'node_modules/monaco-editor')
+    },
     modules: [path.resolve(__dirname, 'node_modules'), 'node_modules'],
     fallback: {
       "stream": require.resolve("stream-browserify"),
@@ -36,7 +44,14 @@ module.exports = {
   plugins: [
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer']
-    })
+    }),
+    {
+      apply: (compiler) => {
+        compiler.hooks.beforeRun.tap('ANTLRBuildPlugin', () => {
+          execSync('antlr4 -Dlanguage=JavaScript src/antlr/BooleanExpressions.g4');
+        });
+      }
+    }
   ],
   mode: 'development'
 };
