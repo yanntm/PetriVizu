@@ -3,24 +3,7 @@ import * as monaco from 'monaco-editor';
 import BooleanExpressionsLexer from './antlr/BooleanExpressionsLexer.js';
 import BooleanExpressionsParser from './antlr/BooleanExpressionsParser.js';
 import BooleanExpressionsVisitor from './antlr/BooleanExpressionsVisitor.js';
-
-self.MonacoEnvironment = {
-  getWorkerUrl: function (moduleId, label) {
-    if (label === 'json') {
-      return './json.worker.bundle.js';
-    }
-    if (label === 'css') {
-      return './css.worker.bundle.js';
-    }
-    if (label === 'html') {
-      return './html.worker.bundle.js';
-    }
-    if (label === 'typescript' || label === 'javascript') {
-      return './ts.worker.bundle.js';
-    }
-    return './editor.worker.bundle.js';
-  }
-};
+import { initializeMonacoEditor } from './monacoSetup.js';
 
 class SyntaxErrorListener extends antlr4.error.ErrorListener {
   constructor() {
@@ -63,33 +46,7 @@ export default class BooleanExpressionEditor {
   }
 
   async initializeEditor() {
-    const monaco = await import('monaco-editor');
-
-    monaco.languages.register({ id: 'booleanExpressions' });
-
-    monaco.languages.setMonarchTokensProvider('booleanExpressions', {
-      tokenizer: {
-        root: [
-          [/\b(true|false)\b/, 'keyword'],
-          [/[a-zA-Z_][\w]*/, 'identifier'],
-          [/[{}()\[\]]/, '@brackets'],
-          [/[<>]=?|[!=]=|[&|~]/, 'operator'],
-          [/[-+\/*=]/, 'operator'],
-          [/[;,.]/, 'delimiter'],
-          [/".*?"/, 'string'],
-        ]
-      }
-    });
-
-    this.editor = monaco.editor.create(document.getElementById('formula-editor'), {
-      value: '',
-      language: 'booleanExpressions',
-      theme: 'vs-dark',
-      suggest: {
-        showKeywords: true
-      },
-      automaticLayout: true
-    });
+    this.editor = await initializeMonacoEditor('booleanExpressions', 'formula-editor');
 
     this.editor.onDidChangeModelContent(() => {
       const value = this.editor.getValue();
@@ -98,12 +55,7 @@ export default class BooleanExpressionEditor {
 
     monaco.languages.registerCompletionItemProvider('booleanExpressions', {
       provideCompletionItems: (model, position) => {
-        const suggestions = this.getSuggestions(model.getValueInRange({
-          startLineNumber: 1,
-          startColumn: 1,
-          endLineNumber: position.lineNumber,
-          endColumn: position.column
-        }));
+        const suggestions = this.getSuggestions(model, position);
         return { suggestions };
       }
     });
@@ -146,7 +98,14 @@ export default class BooleanExpressionEditor {
     monaco.editor.setModelMarkers(this.editor.getModel(), 'booleanExpressions', markers);
   }
 
-  getSuggestions(textUntilPosition) {
+  getSuggestions(model, position) {
+    const textUntilPosition = model.getValueInRange({
+      startLineNumber: 1,
+      startColumn: 1,
+      endLineNumber: position.lineNumber,
+      endColumn: position.column
+    });
+
     const placeNames = this.sharedState.petriNet.reversePlaces;
     return placeNames.map(place => ({
       label: place,
