@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const { execSync } = require('child_process');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = {
   entry: './src/app.js',
@@ -44,6 +45,9 @@ module.exports = {
   plugins: [
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer']
+    }),
+    new MonacoWebpackPlugin({
+      languages: ['json', 'javascript', 'html', 'css']
     }),
     {
       apply: (compiler) => {
