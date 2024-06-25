@@ -1,5 +1,24 @@
+import antlr4 from 'antlr4';
 import BooleanExpressionsLexer from './antlr/BooleanExpressionsLexer.js';
 import BooleanExpressionsParser from './antlr/BooleanExpressionsParser.js';
+
+self.MonacoEnvironment = {
+  getWorkerUrl: function (moduleId, label) {
+    if (label === 'json') {
+      return './json.worker.bundle.js';
+    }
+    if (label === 'css') {
+      return './css.worker.bundle.js';
+    }
+    if (label === 'html') {
+      return './html.worker.bundle.js';
+    }
+    if (label === 'typescript' || label === 'javascript') {
+      return './ts.worker.bundle.js';
+    }
+    return './editor.worker.bundle.js';
+  }
+};
 
 export default class BooleanExpressionEditor {
   constructor(sharedState) {
@@ -32,7 +51,8 @@ export default class BooleanExpressionEditor {
       theme: 'vs-dark',
       suggest: {
         showKeywords: true
-      }
+      },
+      automaticLayout: true
     });
 
     editor.onDidChangeModelContent(() => {
@@ -59,7 +79,7 @@ export default class BooleanExpressionEditor {
   }
 
   getSuggestions(textUntilPosition) {
-    const placeNames = this.sharedState.petriNet.listPlaceNames();
+    const placeNames = this.sharedState.petriNet.reversePlaces;
     return placeNames.map(place => ({
       label: place,
       kind: monaco.languages.CompletionItemKind.Variable,
