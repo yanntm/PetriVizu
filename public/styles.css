@@ -157,3 +157,35 @@ body {
     background-color: #fff;
     box-sizing: border-box; /* Add this */
 }
+#analysis-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.control-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.formula-editor {
+    flex-grow: 1;
+    height: 30px;  /* Adjust this value as necessary */
+    border: 1px solid #ccc;
+}
+
+.run-button {
+    padding: 5px 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-left: 10px;
+    height: 30px;
+}
+
+.run-button:hover {
+    background-color: #45a049;
+}
