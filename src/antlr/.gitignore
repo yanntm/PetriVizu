@@ -5,3 +5,4 @@
 /BooleanExpressionsLexer.tokens
 /BooleanExpressionsListener.js
 /BooleanExpressionsParser.js
+/BooleanExpressionsVisitor.js

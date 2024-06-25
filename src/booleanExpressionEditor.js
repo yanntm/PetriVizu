@@ -2,6 +2,7 @@ import antlr4 from 'antlr4';
 import * as monaco from 'monaco-editor';
 import BooleanExpressionsLexer from './antlr/BooleanExpressionsLexer.js';
 import BooleanExpressionsParser from './antlr/BooleanExpressionsParser.js';
+import BooleanExpressionsVisitor from './antlr/BooleanExpressionsVisitor.js';
 
 self.MonacoEnvironment = {
   getWorkerUrl: function (moduleId, label) {
@@ -33,6 +34,24 @@ class SyntaxErrorListener extends antlr4.error.ErrorListener {
 
   getErrors() {
     return this.errors;
+  }
+}
+
+class IdentifierVisitor extends BooleanExpressionsVisitor {
+  constructor(placeNames, errors) {
+    super();
+    this.placeNames = placeNames;
+    this.errors = errors;
+  }
+
+  visitTerminal(node) {
+    if (node.symbol.type === BooleanExpressionsLexer.ID && !this.placeNames.includes(node.getText())) {
+      this.errors.push({
+        line: node.symbol.line,
+        column: node.symbol.column,
+        msg: `Undefined place: ${node.getText()}`
+      });
+    }
   }
 }
 
@@ -134,23 +153,5 @@ export default class BooleanExpressionEditor {
       kind: monaco.languages.CompletionItemKind.Variable,
       insertText: place
     }));
-  }
-}
-
-class IdentifierVisitor extends BooleanExpressionsParser.BooleanExpressionsParserVisitor {
-  constructor(placeNames, errors) {
-    super();
-    this.placeNames = placeNames;
-    this.errors = errors;
-  }
-
-  visitTerminal(node) {
-    if (node.symbol.type === BooleanExpressionsLexer.ID && !this.placeNames.includes(node.getText())) {
-      this.errors.push({
-        line: node.symbol.line,
-        column: node.symbol.column,
-        msg: `Undefined place: ${node.getText()}`
-      });
-    }
   }
 }
