@@ -23,6 +23,7 @@
     "cytoscape-fcose": "^2.2.0",
     "express": "^4.19.2",
     "monaco-editor": "^0.50.0",
+    "monaco-editor-webpack-plugin": "^7.1.0",
     "sax": "^1.4.1",
     "stream-browserify": "^3.0.0"
   },
