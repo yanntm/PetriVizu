@@ -1,8 +1,8 @@
 import antlr4 from 'antlr4';
 import * as monaco from 'monaco-editor';
-import BooleanExpressionsLexer from './antlr/BooleanExpressionsLexer.js';
-import BooleanExpressionsParser from './antlr/BooleanExpressionsParser.js';
-import BooleanExpressionsVisitor from './antlr/BooleanExpressionsVisitor.js';
+import PropertiesLexer from './antlr/PropertiesLexer.js';
+import PropertiesParser from './antlr/PropertiesParser.js';
+import PropertiesVisitor from './antlr/PropertiesVisitor.js';
 import { initializeMonacoEditor } from './monacoSetup.js';
 
 class SyntaxErrorListener extends antlr4.error.ErrorListener {
@@ -20,7 +20,7 @@ class SyntaxErrorListener extends antlr4.error.ErrorListener {
   }
 }
 
-class IdentifierVisitor extends BooleanExpressionsVisitor {
+class IdentifierVisitor extends PropertiesVisitor {
   constructor(placeNames, errors) {
     super();
     this.placeNames = placeNames;
@@ -28,7 +28,7 @@ class IdentifierVisitor extends BooleanExpressionsVisitor {
   }
 
   visitTerminal(node) {
-    if (node.symbol.type === BooleanExpressionsLexer.ID && !this.placeNames.includes(node.getText())) {
+    if (node.symbol.type === PropertiesLexer.ID && !this.placeNames.includes(node.getText())) {
       this.errors.push({
         line: node.symbol.line,
         column: node.symbol.column,
@@ -46,14 +46,14 @@ export default class BooleanExpressionEditor {
   }
 
   async initializeEditor() {
-    this.editor = await initializeMonacoEditor('booleanExpressions', 'formula-editor');
+    this.editor = await initializeMonacoEditor('Properties', 'formula-editor');
 
     this.editor.onDidChangeModelContent(() => {
       const value = this.editor.getValue();
       this.parseBooleanExpression(value);
     });
 
-    monaco.languages.registerCompletionItemProvider('booleanExpressions', {
+    monaco.languages.registerCompletionItemProvider('Properties', {
       provideCompletionItems: (model, position) => {
         const suggestions = this.getSuggestions(model, position);
         return { suggestions };
@@ -64,13 +64,13 @@ export default class BooleanExpressionEditor {
   parseBooleanExpression(input) {
     const errorListener = new SyntaxErrorListener();
     const chars = new antlr4.InputStream(input);
-    const lexer = new BooleanExpressionsLexer(chars);
+    const lexer = new PropertiesLexer(chars);
     const tokens = new antlr4.CommonTokenStream(lexer);
-    const parser = new BooleanExpressionsParser(tokens);
+    const parser = new PropertiesParser(tokens);
     parser.buildParseTrees = true;
     parser.removeErrorListeners();
     parser.addErrorListener(errorListener);
-    const tree = parser.start();
+    const tree = parser.properties();
 
     const errors = errorListener.getErrors();
     this.validateIdentifiers(tree);
@@ -95,7 +95,7 @@ export default class BooleanExpressionEditor {
       endColumn: error.column + 2,
       message: error.msg
     }));
-    monaco.editor.setModelMarkers(this.editor.getModel(), 'booleanExpressions', markers);
+    monaco.editor.setModelMarkers(this.editor.getModel(), 'Properties', markers);
   }
 
   getSuggestions(model, position) {
