@@ -172,7 +172,7 @@ body {
 
 .formula-editor {
     flex-grow: 1;
-    height: 30px;  /* Adjust this value as necessary */
+    height: 150px;  /* Adjust this value as necessary */
     border: 1px solid #ccc;
 }
 
