@@ -1,25 +1,25 @@
 import PropertyEditor from './propertyEditor.js';
-import PropertyResultViewer from './propertyResult.js';
+import PropertyLauncher from './propertyLauncher.js';
 
 
 export default class AnalysisMode {
     constructor(sharedState) {
         this.sharedState = sharedState;
         this.editor = new PropertyEditor(sharedState, this.runAnalysis.bind(this));
-        this.resultViewer = new PropertyResultViewer(sharedState);
+        this.launcher = new PropertyLauncher(sharedState);
     }
 
     activate() {
         this.editor.activate();
-        this.resultViewer.activate();
+        this.launcher.activate();
     }
 
     deactivate() {
         this.editor.deactivate();
-        this.resultViewer.deactivate();
+        this.launcher.deactivate();
     }
 
     runAnalysis(property) {
-        this.resultViewer.runAnalysis(property);
+        this.launcher.runAnalysis(property);
     }
 }
