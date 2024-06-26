@@ -52,7 +52,7 @@ module.exports = {
     {
       apply: (compiler) => {
         compiler.hooks.beforeRun.tap('ANTLRBuildPlugin', () => {
-          execSync('antlr4 -Dlanguage=JavaScript -visitor src/antlr/BooleanExpressions.g4');
+          execSync('antlr4 -Dlanguage=JavaScript -visitor src/antlr/Properties.g4');
         });
       }
     }
