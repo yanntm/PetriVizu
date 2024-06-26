@@ -1,7 +1,7 @@
 import { PropertyResult } from './propertyResultModel.js';
 import { runAnalysis, serverHelp } from './serverCommunicator.js';
 
-export default class PropertyResultViewer {
+export default class PropertyLauncher {
     constructor(sharedState) {
         this.sharedState = sharedState;
         this.result = new PropertyResult('stdout', 'stderr');
