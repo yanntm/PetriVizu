@@ -1,8 +1,8 @@
-/BooleanExpressions.interp
-/BooleanExpressions.tokens
-/BooleanExpressionsLexer.interp
-/BooleanExpressionsLexer.js
-/BooleanExpressionsLexer.tokens
-/BooleanExpressionsListener.js
-/BooleanExpressionsParser.js
-/BooleanExpressionsVisitor.js
+/Properties.interp
+/Properties.tokens
+/PropertiesLexer.interp
+/PropertiesLexer.js
+/PropertiesLexer.tokens
+/PropertiesListener.js
+/PropertiesParser.js
+/PropertiesVisitor.js
