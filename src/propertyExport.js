@@ -1,4 +1,4 @@
- import antlr4 from 'antlr4';
+import antlr4 from 'antlr4';
 import PropertiesLexer from './antlr/PropertiesLexer.js';
 import PropertiesParser from './antlr/PropertiesParser.js';
 import PropertiesVisitor from './antlr/PropertiesVisitor.js';
@@ -18,11 +18,11 @@ class PropertyExportVisitor extends PropertiesVisitor {
     }
 
     visitProperty(ctx) {
-        const name = ctx.name.getText().replace(/"/g, '');
+        const name = ctx.children[1].getText().replace(/"/g, '');
         this.xmlParts.push(`<property>\n<id>${name}</id>\n`);
         this.xmlParts.push('<description>Automatically generated</description>\n');
         this.xmlParts.push('<formula>\n');
-        this.visit(ctx.logicProp());
+        this.visit(ctx.children[2]);
         this.xmlParts.push('</formula>\n</property>\n');
         return null;
     }
@@ -39,63 +39,54 @@ class PropertyExportVisitor extends PropertiesVisitor {
 
     visitReachableProp(ctx) {
         this.xmlParts.push('<exists-path><finally>\n');
-        this.visit(ctx.predicate());
+        this.visit(ctx.predicate);
         this.xmlParts.push('</finally></exists-path>\n');
         return null;
     }
 
     visitInvariantProp(ctx) {
         this.xmlParts.push('<all-paths><globally>\n');
-        this.visit(ctx.predicate());
+        this.visit(ctx.predicate);
         this.xmlParts.push('</globally></all-paths>\n');
         return null;
     }
 
     visitAtomicProp(ctx) {
-        this.visit(ctx.predicate());
+        this.visit(ctx.predicate);
         return null;
     }
 
     visitCtlProp(ctx) {
-        this.visit(ctx.predicate());
+        this.visit(ctx.predicate);
         return null;
     }
 
     visitLtlProp(ctx) {
-        this.visit(ctx.predicate());
+        this.visit(ctx.predicate);
         return null;
     }
+
+    visitPComparison(ctx) {        
+        return this.visitComparison(ctx);
+    }
+    visitCtlComparison(ctx) {        
+        return this.visitComparison(ctx);
+    }
+    visitLtlComparison(ctx) {        
+        return this.visitComparison(ctx);
+    }
+
 
     visitComparison(ctx) {
-        const operator = ctx.operator().getText();
-        switch (operator) {
-            case '<=':
-                this.xmlParts.push('<integer-le>\n');
-                break;
-            case '<':
-                this.xmlParts.push('<integer-lt>\n');
-                break;
-            case '>=':
-                this.xmlParts.push('<integer-ge>\n');
-                break;
-            case '>':
-                this.xmlParts.push('<integer-gt>\n');
-                break;
-            case '==':
-                this.xmlParts.push('<integer-eq>\n');
-                break;
-            case '!=':
-                this.xmlParts.push('<integer-ne>\n');
-                break;
-            default:
-                throw new Error(`Unsupported operator: ${operator}`);
-        }
-        this.visit(ctx.left);
-        this.visit(ctx.right);
-        this.xmlParts.push(`</${this.getTagNameForOperator(operator)}>\n`);
-        return null;
+      const operator = ctx.children[1].getText(); // Fixing access to operator
+      const tagName = this.getTagNameForOperator(operator);
+      this.xmlParts.push(`<${tagName}>\n`);
+      this.visit(ctx.children[0]); // Visit left operand
+      this.visit(ctx.children[2]); // Visit right operand
+      this.xmlParts.push(`</${tagName}>\n`);
+      return null;
     }
-
+    
     getTagNameForOperator(operator) {
         switch (operator) {
             case '<=':
@@ -121,11 +112,12 @@ class PropertyExportVisitor extends PropertiesVisitor {
     }
 
     visitReference(ctx) {
-        this.xmlParts.push(`<tokens-count><place>${ctx.getText()}</place></tokens-count>\n`);
+        const name = ctx.getText().replace(/"/g, '');
+        this.xmlParts.push(`<tokens-count><place>${name}</place></tokens-count>\n`);
         return null;
     }
 
-    // Add more visit methods for other expressions as needed...
+    
 }
 
 function parseInput(input) {
@@ -137,16 +129,15 @@ function parseInput(input) {
     return parser.properties();
 }
 
-function exportToXML(input, outputPath) {
+function exportToXML(input) {
     const tree = parseInput(input);
     const visitor = new PropertyExportVisitor();
     tree.accept(visitor);
     console.log(visitor.xmlParts.join(''));
 }
 
-
-export function test () {
-const testInput = `
+export function test() {
+    const testInput = `
 property "ReachabilityProperty1" [reachable] : "P1" + P2 <= 5;
 property "InvariantProperty1" [invariant] : P1 + P2 > 5;
 property "AP1" [atom] : P1 <= P2;
@@ -160,8 +151,5 @@ property "KeywordProperty" [ctl] : "A"==0 && AX(P1 <= 10);
 property "ComplexProperty" [ltl] : F("A" + B == 0 U C <= "F" + 5);
 `;
 
-const outputPath = 'propertySet.xml';
-exportToXML(testInput, outputPath);
-console.log(`Properties exported to ${outputPath}`);
+    exportToXML(testInput);
 }
-
