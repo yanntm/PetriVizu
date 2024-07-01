@@ -1,0 +1,16 @@
+{
+    "version": "2.0.0",
+    "configurations": [
+        
+        {
+            "name": "Debug ANTLR4 grammar",
+            "type": "antlr-debug",
+            "request": "launch",
+            "input": "examples/props.txt",
+            "grammar": "src/antlr/Properties.g4",            
+            "startRule": "properties",
+            "printParseTree": true,
+            "visualParseTree": true
+        }
+    ]
+}
