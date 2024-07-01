@@ -1,5 +1,21 @@
 grammar Properties;
 
+
+/**
+property "ReachabilityProperty1" [reachable] : "P1" + P2 <= 5;
+property "InvariantProperty1" [invariant] : P1 + P2 > 5;
+property "AP1" [atom] : P1 <= P2;
+property "RefAtom" [reachable] : AP1;
+property "CTLProperty1" [ctl] : AG(P1 <= 10 && P2 > 3);
+property "CTLProperty2" [ctl] : E (P1 <= 10) U (P2 > 3);
+property "LTLProperty1" [ltl] : G(P1 <= 10);
+property "LTLProperty2" [ltl] : F(P2 > 3 U P1 <= 10);
+property "BoundsProperty1" [bounds] : P1 + P2;
+property "KeywordProperty" [ctl] : "A"==0 && AX(P1 <= 10);
+property "ComplexProperty" [ltl] : F("A" + B == 0 U C <= "F" + 5);
+
+*/
+
 properties
     : property* EOF
     ;
@@ -23,7 +39,6 @@ boolProp
 safetyProp
     : reachableProp
     | invariantProp
-    | neverProp
     ;
 
 boundsProp
@@ -36,10 +51,6 @@ reachableProp
 
 invariantProp
     : '[' 'invariant' ']' ':' predicate=pOr
-    ;
-
-neverProp
-    : '[' 'never' ']' ':' predicate=pOr
     ;
 
 atomicProp
