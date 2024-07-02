@@ -12,7 +12,7 @@ property "LTLProperty1" [ltl] : G(P1 <= 10);
 property "LTLProperty2" [ltl] : F(P2 > 3 U P1 <= 10);
 property "BoundsProperty1" [bounds] : P1 + P2;
 property "KeywordProperty" [ctl] : "A"==0 && AX(P1 <= 10);
-property "ComplexProperty" [ltl] : F("A" + B == 0 U C <= "F" + 5);
+property "ComplexProperty" [ltl] : F("A" + B == 0 U C <= "F" );
 
 */
 
@@ -69,43 +69,17 @@ ltlProp
 
 /* ====== Arithmetic operators ======= */
 // by order of increasing precedence
-addition
-    : primary ( ( '+' | '-' ) primary )*
-    ;
-
-primary
-    : variableReference
-    | constRef
-    | '(' addition ')'
-    | '(' wrapBoolExpr ')'
-    ;
-
-constRef
-    : constant
-    | paramRef
-    ;
-
-wrapBoolExpr
-    : value=pOr
-    ;
-
 constant
     : INT
     ;
 
 pAddition
-    : pPrimary ( ( '+' | '-' ) pPrimary )*
+    : pPrimary ( '+'  pPrimary )*
     ;
 
 pPrimary
     : reference
-    | constRef
-    | '(' pAddition ')'
-    | '(' pWrapBoolExpr ')'
-    ;
-
-pWrapBoolExpr
-    : value=pOr
+    | constant
     ;
 
 pOr
@@ -117,16 +91,14 @@ pAnd
     ;
 
 pNot
-    : '!' pPrimaryBool
-    | pPrimaryBool
-    ;
+    : isNeg='!'? pPrimaryBool  ;
 
 pPrimaryBool
-    : 'true'
-    | 'false'
+    : tTrue
+    | fFalse
     | pComparison
-    | '(' pOr ')'
-    | reference
+    | '(' nested=pOr ')'
+    | atomReference
     ;
 
 pComparison
@@ -142,29 +114,15 @@ comparisonOperators
     | '!='
     ;
 
-ctlAddition
-    : ctlPrimary ( ( '+' | '-' ) ctlPrimary )*
-    ;
-
-ctlPrimary
-    : reference
-    | constRef
-    | '(' ctlAddition ')'
-    | '(' ctlWrapBoolExpr ')'
-    ;
-
-ctlWrapBoolExpr
-    : value=ctlOr
-    ;
 
 ctlUntil
-    : 'A' ctlImply 'U' ctlImply
-    | 'E' ctlImply 'U' ctlImply
-    | ctlImply
+    : q='A' left=ctlImply 'U' right=ctlImply
+    | q='E' left=ctlImply 'U' right=ctlImply
+    | left=ctlImply
     ;
 
 ctlImply
-    : ctlOr ( '->' ctlOr )*
+    : left=ctlOr ('->' right=ctlOr)?
     ;
 
 ctlOr
@@ -176,43 +134,20 @@ ctlAnd
     ;
 
 ctlTemporal
-    : 'AG' ctlNot
-    | 'AF' ctlNot
-    | 'AX' ctlNot
-    | 'EG' ctlNot
-    | 'EF' ctlNot
-    | 'EX' ctlNot
-    | ctlNot
+    : op=('AG'|'AF'|'AX'|'EG'|'EF'|'EX')? left=ctlNot
     ;
 
 ctlNot
-    : '!' ctlPrimaryBool
-    | ctlPrimaryBool
+    : isNeg='!'? left=ctlPrimaryBool
     ;
 
 ctlPrimaryBool
-    : 'true'
-    | 'false'
-    | ctlComparison
-    | '(' ctlUntil ')'
-    ;
-
-ctlComparison
-    : left=ctlAddition operator=comparisonOperators right=ctlAddition
-    ;
-
-ltlAddition
-    : ltlPrimary ( ( '+' | '-' ) ltlPrimary )*
-    ;
-
-ltlPrimary
-    : reference
-    | constRef
-    | '(' ltlAddition ')'
+    : pPrimaryBool
+    | '(' nested=ctlUntil ')'
     ;
 
 ltlImply
-    : ltlOr ( '->' ltlOr )*
+    : left=ltlOr ( '->' right=ltlOr )?
     ;
 
 ltlOr
@@ -224,34 +159,24 @@ ltlAnd
     ;
 
 ltlUntil
-    : ltlFutGen ( 'U' ltlFutGen )*
+    : left=ltlFutGen ( 'U' right=ltlFutGen )?
     ;
 
 ltlFutGen
-    : 'F' ltlFutGen
-    | 'G' ltlFutGen
-    | ltlNext
+    : op=('F'|'G')? left=ltlNext
     ;
 
 ltlNext
-    : 'X' ltlNext
-    | ltlNot
+    : op='X'? left=ltlNot
     ;
 
 ltlNot
-    : '!' ltlPrimaryBool
-    | ltlPrimaryBool
+    : isNeg='!'? ltlPrimaryBool    
     ;
 
 ltlPrimaryBool
-    : 'true'
-    | 'false'
-    | ltlComparison
-    | '(' ltlImply ')'
-    ;
-
-ltlComparison
-    : left=ltlAddition operator=comparisonOperators right=ltlAddition
+    : pPrimaryBool
+    | '(' nested=ltlImply ')'
     ;
 
 boundsPredicate
@@ -260,26 +185,22 @@ boundsPredicate
 
 bpPrimary
     : reference
-    | constRef
+    | constant
     ;
 
 reference
-    : ID | STRING
+    : name=(ID | STRING)
     ;
 
-paramRef
-    : PARAM
+atomReference
+    : '@' name=(ID | STRING)
     ;
 
-variableReference
-    : ID | STRING
-    ;
-
-True
+tTrue
     : 'true'
     ;
 
-False
+fFalse
     : 'false'
     ;
 
