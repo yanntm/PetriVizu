@@ -33,7 +33,7 @@ export async function fetchExaminationToolMap() {
     }
 }
 
-export async function runAnalysis(petriNet, examination, tool, timeout, resultHandler) {
+export async function runAnalysis(petriNet, examination, tool, timeout, resultHandler, properties = null) {
     const stdoutElem = resultHandler.stdoutElem;
     const stderrElem = resultHandler.stderrElem;
     stdoutElem.value = '';
@@ -44,6 +44,11 @@ export async function runAnalysis(petriNet, examination, tool, timeout, resultHa
         const formData = new FormData();
         const blob = new Blob([pnmlContent], { type: 'application/xml' });
         formData.append('model.pnml', blob, 'model.pnml');
+
+        if (properties) {
+            const logicBlob = new Blob([properties], { type: 'text/plain' });
+            formData.append('model.logic', logicBlob, 'model.logic');
+        }
 
         const response = await fetch(`http://localhost:5000/mcc/PT/${examination}/${tool}`, {
             method: 'POST',
