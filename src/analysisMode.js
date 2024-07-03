@@ -3,10 +3,10 @@ import PropertyLauncher from './propertyLauncher.js';
 
 
 export default class AnalysisMode {
-    constructor(sharedState) {
+    constructor(sharedState,propertyEditor) {
         this.sharedState = sharedState;
-        this.editor = new PropertyEditor(sharedState, this.runAnalysis.bind(this));
-        this.launcher = new PropertyLauncher(sharedState);
+        this.editor = new PropertyEditor(sharedState, this.runAnalysis.bind(this));        
+        this.launcher = new PropertyLauncher(sharedState, propertyEditor);        
     }
 
     activate() {
