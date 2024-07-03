@@ -1,8 +1,6 @@
 import { fetchExaminationToolMap, serverHelp } from './serverCommunicator.js';
 import { PropertyDefinition } from './propertyDefinition.js';
 
-const EXAMINATIONS_WITHOUT_XML = ["StateSpace", "OneSafe", "StableMarking", "QuasiLiveness", "Liveness", "ReachabilityDeadlock"];
-const EXAMINATIONS_WITH_XML = ["UpperBounds", "ReachabilityFireability", "ReachabilityCardinality", "CTLFireability", "CTLCardinality", "LTLFireability", "LTLCardinality"];
 
 export default class PropertyEditor {
     constructor(sharedState, onSave) {
@@ -43,18 +41,17 @@ export default class PropertyEditor {
     populateExaminations() {
         const examinationSelector = document.getElementById('examination-selector');
         examinationSelector.innerHTML = '';
-
-        EXAMINATIONS_WITHOUT_XML.forEach(exam => {
-            if (this.examinationToolMap[exam]) {
-                const option = document.createElement('option');
-                option.value = exam;
-                option.textContent = exam;
-                examinationSelector.appendChild(option);
-            }
+    
+        Object.keys(this.examinationToolMap).forEach(exam => {
+            const option = document.createElement('option');
+            option.value = exam;
+            option.textContent = exam;
+            examinationSelector.appendChild(option);
         });
-
+    
         this.updateTools();
     }
+
 
     updateTools() {
         const examinationSelector = document.getElementById('examination-selector');

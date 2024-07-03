@@ -1,11 +1,14 @@
 import { PropertyResult } from './propertyResultModel.js';
 import { runAnalysis, serverHelp } from './serverCommunicator.js';
 
+const EXAMINATIONS_WITHOUT_XML = ["StateSpace", "OneSafe", "StableMarking", "QuasiLiveness", "Liveness", "ReachabilityDeadlock"];
+const EXAMINATIONS_WITH_XML = ["UpperBounds", "ReachabilityFireability", "ReachabilityCardinality", "CTLFireability", "CTLCardinality", "LTLFireability", "LTLCardinality"];
+
 export default class PropertyLauncher {
-    constructor(sharedState) {
+    constructor(sharedState,editor) {
         this.sharedState = sharedState;
         this.result = new PropertyResult('stdout', 'stderr');
-        
+        this.editor = editor;
         this.setupRunAnalysis();
     }
 
@@ -22,8 +25,13 @@ export default class PropertyLauncher {
                 selectedTool += 'xred';
             }
 
+            let properties = null;
+            if (EXAMINATIONS_WITH_XML.includes(selectedExamination)) {
+                properties = this.editor.editor.getValue();
+            }
+
             try {
-                await runAnalysis(this.sharedState.petriNet, selectedExamination, selectedTool, timeout, this.result);
+                await runAnalysis(this.sharedState.petriNet, selectedExamination, selectedTool, timeout, this.result, properties);
             } catch (error) {
                 this.handleError(error);
             }

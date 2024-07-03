@@ -6,6 +6,7 @@ import PropertyMode from './propertyMode.js';
 import BooleanExpressionEditor from './booleanExpressionEditor.js';
 import { buildExample } from './example.js';
 import LayoutHandler from './layoutHandler.js';
+import {test} from './propertyExport.js';
 
 let currentMode;
 const sharedState = {
@@ -15,9 +16,9 @@ const sharedState = {
 const viewMode = new ViewMode(sharedState);
 const editMode = new EditMode(sharedState);
 const simulationMode = new SimulationMode(sharedState);
-const analysisMode = new AnalysisMode(sharedState);
-const propertyMode = new PropertyMode(sharedState);
 const booleanExpressionEditor = new BooleanExpressionEditor(sharedState);
+const analysisMode = new AnalysisMode(sharedState,booleanExpressionEditor);
+const propertyMode = new PropertyMode(sharedState);
 const layoutHandler = new LayoutHandler();
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -40,6 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
         viewMode.layout('cose');
     });
 });
+
+
 
 function switchTab(tabName) {
     if (currentMode) {
