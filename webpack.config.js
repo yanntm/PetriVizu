@@ -29,7 +29,7 @@ module.exports = {
       directory: path.join(__dirname, 'website')
     },
     compress: true,
-    port: 1664,
+    port: 1665,
     open: true
   },
   resolve: {
