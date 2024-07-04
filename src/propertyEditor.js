@@ -11,6 +11,10 @@ export default class PropertyEditor {
 
         this.setupEditorControls();
         this.init();
+        document.getElementById('helpButton').addEventListener('click', function() {
+          window.open('https://github.com/yanntm/PetriVizu/blob/master/public/syntax.md', '_blank');
+        });
+
     }
 
     async init() {

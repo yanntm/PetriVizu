@@ -245,3 +245,7 @@ body {
     resize: none;
 }
 
+.vertical-container {
+    display: flex;
+    flex-direction: column;
+}
