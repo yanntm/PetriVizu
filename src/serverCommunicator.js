@@ -6,7 +6,7 @@ export function serverHelp() {
 
 export async function fetchExaminationToolMap() {
     try {
-        const response = await fetch('http://localhost:5000/tools/descriptions');
+        const response = await fetch('http://localhost:1664/tools/descriptions');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -50,7 +50,7 @@ export async function runAnalysis(petriNet, examination, tool, timeout, resultHa
             formData.append('model.logic', logicBlob, 'model.logic');
         }
 
-        const response = await fetch(`http://localhost:5000/mcc/PT/${examination}/${tool}`, {
+        const response = await fetch(`http://localhost:1664/mcc/PT/${examination}/${tool}`, {
             method: 'POST',
             body: formData
         });

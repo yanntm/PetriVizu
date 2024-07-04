@@ -70,7 +70,7 @@ export default class PropertyMode {
         stderrElem.value = '';
 
         try {
-            const response = await fetch(`http://localhost:5000/mcc/PT/${property.examination}/${property.tool}`, {
+            const response = await fetch(`http://localhost:1664/mcc/PT/${property.examination}/${property.tool}`, {
                 method: 'POST',
                 body: formData
             });
