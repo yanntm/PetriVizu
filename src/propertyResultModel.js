@@ -17,11 +17,18 @@ export class PropertyResult {
     parseAndRenderResults(text) {
         const lines = text.split('\n');
         lines.forEach(line => {
-            const match = line.match(/^FORMULA\s+(\S+)\s+(\S+)\s+TECHNIQUES\s+(.*)$/);
+            let match = line.match(/^FORMULA\s+(\S+)\s+(\S+)\s+TECHNIQUES\s+(.*)$/);
             if (match) {
                 const formula = match[1];
                 const value = match[2];
                 this.addResultToTable(formula, value);
+            } else {
+                match = line.match(/^STATE_SPACE\s+(\S+)\s+(\d+)\s+TECHNIQUES\s+(.*)$/);
+                if (match) {
+                    const metric = match[1];
+                    const value = match[2];
+                    this.addResultToTable(metric, value);
+                }
             }
         });
     }
