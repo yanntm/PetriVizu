@@ -1,7 +1,6 @@
 # Property Syntax
 
-The syntax supports defining a set of properties; each one will have a name and a definition.
-These are some examples of property definitions.
+The syntax supports defining a set of properties; each one will have a name and a definition. Below are examples of property definitions.
 
 ```
 property "ReachabilityProperty1" [reach] : EF "P1" + P2 <= 5;
@@ -17,10 +16,9 @@ property "KeywordProperty" [ctl] : "A"==0 && AX(P1 <= 10);
 property "ComplexProperty" [ltl] : F("A" + B == 0 U C <= "F" + 5);
 ```
 
-## Atoms, Boolean Predicates
+## Atoms and Boolean Predicates
 
-Atoms are the simplest elements; they do not define a property per se but can be referred to in other properties using `@nameofatom`.
-An atom is defined by providing a Boolean predicate.
+Atoms are the simplest elements; they do not define a property per se but can be referred to in other properties using `@nameofatom`. An atom is defined by providing a Boolean predicate.
 
 ### Examples of Atoms
 ``` 
@@ -43,14 +41,15 @@ A comparison of a place or sum of places to another place expression or constant
 
 To refer to a place, simply use its name. If the name is a keyword (A, E, F, G, U, X, AF, AG, AX, EF, EG, EX...) it must be quoted.
 
+### Example of Quoting
 ``` 
 property "Incorrect_Aless5" [atom] : A <= 5;
 property "Correct_Aless5" [atom] : "A" <= 5;
 ```
 
-Predicates are defined using boolean operators `&&` (and), `||` (or), `!` (not). 
-Usual priority applies: `!`, `&&`, `||`, but if in doubt simply add more parentheses.
+Predicates are defined using boolean operators `&&` (and), `||` (or), `!` (not). Usual priority applies: `!`, `&&`, `||`, but if in doubt simply add more parentheses.
 
+### Examples of Complex Atoms
 ``` 
 property "ComplexAtom1" [atom] : P1 <= 5 && P2 > 3;
 property "ComplexAtom2" [atom] : !(P1 == 0) || P3 <= 4;
@@ -58,36 +57,45 @@ property "ComplexAtom2" [atom] : !(P1 == 0) || P3 <= 4;
 
 ## Reachability Property Definitions
 
-  ``` 
-  property "PropertyName" [reach] : (AG|EF) Predicate;
-  ```
+### Syntax
+``` 
+property "PropertyName" [reach] : (AG|EF) Predicate;
+```
 
-The body of a reachability property is prefixed by 
-* EF :Exists in Future, the situation described in the predicate is reachable from initial
-* AG :Always Globally, the situation by the predicate is an invariant, true of all reachable states
+The body of a reachability property is prefixed by:
+- **EF**: Exists in Future. The situation described in the predicate is reachable from the initial state.
+- **AG**: Always Globally. The situation by the predicate is an invariant, true in all reachable states.
 
-The predicate itself uses the same syntax as atoms, and can also refer to atoms.
+The predicate itself uses the same syntax as atoms and can also refer to atoms.
 
-### Bounds Properties
+### Examples
+``` 
+property "ReachabilityExample" [reach] : EF (P1 + P2 <= 10);
+property "InvariantExample" [reach] : AG (P1 > 0 && P2 < 5);
+```
+
+## Bounds Properties
+
 Bounds properties compute the maximum number of tokens that can occupy the provided places in any reachable marking.
 
+### Syntax
 ``` 
 property "PropertyName" [bounds] : BoundsExpression;
 ```
 
-Examples :
-```
+### Examples
+``` 
 property "SinglePlaceBounds" [bounds] : P1;
 property "SumPlaceBounds" [bounds] : P1 + P2;
 ```
 
-Technically, a bounds property is defined by providing a set of places,
- in practice we use `+` to combine places (the query computes the bounds of the given expression).
+Technically, a bounds property is defined by providing a set of places. In practice, we use `+` to combine places (the query computes the bounds of the given expression).
 
-### CTL Properties
+## CTL Properties
 
 CTL properties define temporal logic properties using Computation Tree Logic.
 
+### Syntax
 ``` 
 property "PropertyName" [ctl] : CTLFormula;
 ```
@@ -102,12 +110,19 @@ property "PropertyName" [ctl] : CTLFormula;
 - **A(phi U psi)**: Always until. Phi holds until psi is satisfied in all paths.
 - **E(phi U psi)**: Exists until. There exists a path where phi holds until psi is satisfied.
 
-In addition, CTL formulas can be combined using boolean operators `&&` (and), `||` (or), `!` (not) as well as `->` implication.
-CTL formulas can use `@formulaName` syntax to refer to atoms, reachability properties and CTL properties that are defined higher in the file.
+In addition, CTL formulas can be combined using boolean operators `&&` (and), `||` (or), `!` (not) as well as `->` (implication). CTL formulas can use `@formulaName` syntax to refer to atoms, reachability properties, and CTL properties that are defined higher in the file.
 
-### LTL Properties
+### Examples
+``` 
+property "CTLProperty1" [ctl] : AG(P1 <= 10 && P2 > 3);
+property "CTLProperty2" [ctl] : E(P1 <= 10) U (P2 > 3);
+```
+
+## LTL Properties
+
 LTL properties define temporal logic properties using Linear Temporal Logic.
 
+### Syntax
 ``` 
 property "PropertyName" [ltl] : LTLFormula;
 ```
@@ -118,23 +133,17 @@ property "PropertyName" [ltl] : LTLFormula;
 - **X phi**: Next. On all paths, phi is satisfied in the next state.
 - **phi U psi**: Until. On all paths, phi holds until psi is satisfied.
 
-In addition, LTL formulas can be combined using boolean operators `&&` (and), `||` (or), `!` (not) as well as `->` implication.
-LTL formulas can use `@formulaName` syntax to refer to atoms, and LTL properties that are defined higher in the file.
-
+In addition, LTL formulas can be combined using boolean operators `&&` (and), `||` (or), `!` (not) as well as `->` (implication). LTL formulas can use `@formulaName` syntax to refer to atoms and LTL properties that are defined higher in the file.
 
 ### Examples
 ``` 
-property "CTLProperty1" [ctl] : AG(P1 <= 10 && P2 > 3);
-property "CTLProperty2" [ctl] : E(P1 <= 10) U (P2 > 3);
-
 property "LTLProperty1" [ltl] : G(P1 <= 10);
 property "LTLProperty2" [ltl] : F(P2 > 3 U P1 <= 10);
 ```
 
 ## Caveats and Issues
 
-- **Temporal operators**: Whitespace around temporal operators is mandatory. For instance, `GF phi` is parsed as an ID in LTL, 
-you must use spaces to separate the operators, e.g. `G F phi`. Similarly in CTL, the operators (except Until) are two letters,
-so `AG phi` is correct but `A G phi` is illegal. 
+- **Temporal operators**: Whitespace around temporal operators is mandatory. For instance, `GF phi` is parsed as an ID in LTL, you must use spaces to separate the operators, e.g. `G F phi`. Similarly in CTL, the operators (except Until) are two letters, so `AG phi` is correct but `A G phi` is illegal.
 - **Quoted Strings**: If an ID is a temporal operator (e.g., `A`, `U`, `X`...), quote it as a string: `"A"`.
+
 
