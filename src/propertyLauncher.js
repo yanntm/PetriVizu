@@ -5,7 +5,7 @@ const EXAMINATIONS_WITHOUT_XML = ["StateSpace", "OneSafe", "StableMarking", "Qua
 const EXAMINATIONS_WITH_XML = ["UpperBounds", "ReachabilityFireability", "ReachabilityCardinality", "CTLFireability", "CTLCardinality", "LTLFireability", "LTLCardinality"];
 
 export default class PropertyLauncher {
-    constructor(sharedState,editor) {
+    constructor(sharedState, editor) {
         this.sharedState = sharedState;
         this.result = new PropertyResult('stdout', 'stderr');
         this.editor = editor;
@@ -30,12 +30,19 @@ export default class PropertyLauncher {
                 properties = this.editor.editor.getValue();
             }
 
+            this.clearResultsTable();
+
             try {
                 await runAnalysis(this.sharedState.petriNet, selectedExamination, selectedTool, timeout, this.result, properties);
             } catch (error) {
                 this.handleError(error);
             }
         });
+    }
+
+    clearResultsTable() {
+        const resultsDiv = document.getElementById('results');
+        resultsDiv.innerHTML = '';
     }
 
     handleError(error) {

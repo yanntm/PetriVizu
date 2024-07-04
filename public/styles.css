@@ -189,3 +189,59 @@ body {
 .run-button:hover {
     background-color: #45a049;
 }
+
+/* Style for the results div */
+#results {
+    margin-top: 20px;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+/* Style for individual result rows */
+.result-row {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #ddd;
+    padding: 8px 0;
+}
+
+/* Style for formula column */
+.result-formula {
+    flex: 1;
+    padding: 8px;
+    text-align: left;
+}
+
+/* Style for value column */
+.result-value {
+    flex: 1;
+    padding: 8px;
+    text-align: right;
+    font-weight: bold;
+}
+
+/* Style for alternating row colors */
+.result-row:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Style for hover effect on rows */
+.result-row:hover {
+    background-color: #f1f1f1;
+}
+
+/* Additional styling for better readability */
+#results h3 {
+    margin-bottom: 10px;
+}
+
+#output-wrapper textarea {
+    width: 100%;
+    height: 150px;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: none;
+}
+
