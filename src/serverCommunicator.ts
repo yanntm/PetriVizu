@@ -1,18 +1,31 @@
-import { exportToPNMLContent } from './exporter.js';
+import { exportToPNMLContent } from './exporter';
 
-export function serverHelp() {
+export function serverHelp(): string {
     return 'Error communicating with the server. Please visit https://github.com/yanntm/MCC-server and follow the README to get the server running.';
 }
 
-export async function fetchExaminationToolMap() {
+interface ToolInfo {
+    PTexaminations?: string[];
+    tool: string;
+}
+
+interface Data {
+    tools_info: ToolInfo[];
+}
+
+interface ExaminationToolMap {
+    [key: string]: Set<string>;
+}
+
+export async function fetchExaminationToolMap(): Promise<ExaminationToolMap> {
     try {
         const response = await fetch('http://localhost:1664/tools/descriptions');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json();
+        const data: Data = await response.json();
 
-        const examinationToolMap = {};
+        const examinationToolMap: ExaminationToolMap = {};
 
         data.tools_info.forEach(toolInfo => {
             if (toolInfo.PTexaminations) {
@@ -33,7 +46,21 @@ export async function fetchExaminationToolMap() {
     }
 }
 
-export async function runAnalysis(petriNet, examination, tool, timeout, resultHandler, properties = null) {
+interface ResultHandler {
+    stdoutElem: HTMLTextAreaElement;
+    stderrElem: HTMLTextAreaElement;
+    appendToOut: (text: string) => void;
+    appendToErr: (text: string) => void;
+}
+
+export async function runAnalysis(
+    petriNet: any,
+    examination: string,
+    tool: string,
+    timeout: number,
+    resultHandler: ResultHandler,
+    properties: string | null = null
+): Promise<void> {
     const stdoutElem = resultHandler.stdoutElem;
     const stderrElem = resultHandler.stderrElem;
     stdoutElem.value = '';
@@ -50,6 +77,9 @@ export async function runAnalysis(petriNet, examination, tool, timeout, resultHa
             formData.append('model.logic', logicBlob, 'model.logic');
         }
 
+        // Append the timeout to the form data
+        formData.append('timeout', timeout.toString());
+
         const response = await fetch(`http://localhost:1664/mcc/PT/${examination}/${tool}`, {
             method: 'POST',
             body: formData
@@ -59,7 +89,7 @@ export async function runAnalysis(petriNet, examination, tool, timeout, resultHa
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const reader = response.body.getReader();
+        const reader = response.body!.getReader();
         const decoder = new TextDecoder('utf-8');
         let done = false;
 

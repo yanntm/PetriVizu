@@ -1,5 +1,5 @@
 import { PropertyResult } from './propertyResultModel.js';
-import { runAnalysis, serverHelp } from './serverCommunicator.js';
+import { runAnalysis, serverHelp } from './serverCommunicator';
 
 const EXAMINATIONS_WITHOUT_XML = ["StateSpace", "OneSafe", "StableMarking", "QuasiLiveness", "Liveness", "ReachabilityDeadlock"];
 const EXAMINATIONS_WITH_XML = ["UpperBounds", "ReachabilityFireability", "ReachabilityCardinality", "CTLFireability", "CTLCardinality", "LTLFireability", "LTLCardinality"];
