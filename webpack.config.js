@@ -4,13 +4,18 @@ const { execSync } = require('child_process');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = {
-  entry: './src/app.js',
+  entry: './src/app.ts', // Change entry point to TypeScript
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'website/js')
   },
   module: {
     rules: [
+      {
+        test: /\.tsx?$/, // Add rule for TypeScript files
+        exclude: /node_modules/,
+        use: 'ts-loader'
+      },
       {
         test: /\.js$/,
         exclude: /node_modules/,
@@ -36,6 +41,7 @@ module.exports = {
     alias: {
       'monaco-editor': path.resolve(__dirname, 'node_modules/monaco-editor')
     },
+    extensions: ['.tsx', '.ts', '.js'], // Add TypeScript extensions
     modules: [path.resolve(__dirname, 'node_modules'), 'node_modules'],
     fallback: {
       "stream": require.resolve("stream-browserify"),

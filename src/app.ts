@@ -1,14 +1,16 @@
-import ViewMode from './viewMode.js';
-import EditMode from './editMode.js';
-import SimulationMode from './simulationMode.js';
-import AnalysisMode from './analysisMode.js';
-import PropertyMode from './propertyMode.js';
-import BooleanExpressionEditor from './booleanExpressionEditor.js';
-import { buildExample } from './example.js';
-import LayoutHandler from './layoutHandler.js';
-import {test} from './propertyExport.js';
+import ViewMode from './viewMode';
+import EditMode from './editMode';
+import SimulationMode from './simulationMode';
+import AnalysisMode from './analysisMode';
+import PropertyMode from './propertyMode';
+import BooleanExpressionEditor from './booleanExpressionEditor';
+import { buildExample } from './example';
+import LayoutHandler from './layoutHandler';
 
-let currentMode;
+type Mode = ViewMode | EditMode | SimulationMode | AnalysisMode | PropertyMode;
+
+let currentMode: Mode | null = null;
+
 const sharedState = {
     petriNet: buildExample()
 };
@@ -17,7 +19,7 @@ const viewMode = new ViewMode(sharedState);
 const editMode = new EditMode(sharedState);
 const simulationMode = new SimulationMode(sharedState);
 const booleanExpressionEditor = new BooleanExpressionEditor(sharedState);
-const analysisMode = new AnalysisMode(sharedState,booleanExpressionEditor);
+const analysisMode = new AnalysisMode(sharedState, booleanExpressionEditor);
 const propertyMode = new PropertyMode(sharedState);
 const layoutHandler = new LayoutHandler();
 
@@ -28,8 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.tab-button').forEach(button => {
         button.addEventListener('click', (event) => {
-            const tabName = event.target.getAttribute('data-tab');
-            switchTab(tabName);
+            const target = event.target as HTMLElement;
+            const tabName = target.getAttribute('data-tab');
+            if (tabName) {
+                switchTab(tabName);
+            }
         });
     });
 
@@ -42,9 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-
-
-function switchTab(tabName) {
+function switchTab(tabName: string) {
     if (currentMode) {
         currentMode.deactivate();
     }
@@ -63,15 +66,20 @@ function switchTab(tabName) {
     }
     
     requestAnimationFrame(() => {
-        layoutHandler.setCurrentMode(currentMode);
-        currentMode.activate();        
+        if (currentMode) {
+            layoutHandler.setCurrentMode(currentMode);
+            currentMode.activate();
+        }
     });
 }
 
-function updateTabContent(tabName) {
-    const tabs = document.getElementsByClassName('tab-content');
+function updateTabContent(tabName: string) {
+    const tabs = document.getElementsByClassName('tab-content') as HTMLCollectionOf<HTMLElement>;
     for (let i = 0; i < tabs.length; i++) {
         tabs[i].style.display = 'none';
     }
-    document.getElementById(tabName).style.display = 'block';
+    const tabContent = document.getElementById(tabName);
+    if (tabContent) {
+        tabContent.style.display = 'block';
+    }
 }
