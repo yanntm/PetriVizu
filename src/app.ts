@@ -4,16 +4,17 @@ import SimulationMode from './simulationMode';
 import AnalysisMode from './analysisMode';
 import PropertyMode from './propertyMode';
 import BooleanExpressionEditor from './booleanExpressionEditor';
-import { buildExample } from './example';
+import {SharedState } from './sharedState';
 import LayoutHandler from './layoutHandler';
+import { buildExample } from './example';
 
 type Mode = ViewMode | EditMode | SimulationMode | AnalysisMode | PropertyMode;
 
 let currentMode: Mode | null = null;
 
-const sharedState = {
-    petriNet: buildExample()
-};
+const sharedState: SharedState = {
+        petriNet: buildExample()
+    };
 
 const viewMode = new ViewMode(sharedState);
 const editMode = new EditMode(sharedState);
@@ -25,7 +26,7 @@ const layoutHandler = new LayoutHandler();
 
 document.addEventListener('DOMContentLoaded', () => {
     currentMode = viewMode;
-    
+
     layoutHandler.setCurrentMode(currentMode);
 
     document.querySelectorAll('.tab-button').forEach(button => {
@@ -40,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Ensure the viewer tab is visible by default
     switchTab('viewer');
-    
+
     requestAnimationFrame(() => {
         viewMode.activate();
         viewMode.layout('cose');
@@ -64,7 +65,7 @@ function switchTab(tabName: string) {
     } else if (tabName === 'property') {
         currentMode = propertyMode;
     }
-    
+
     requestAnimationFrame(() => {
         if (currentMode) {
             layoutHandler.setCurrentMode(currentMode);
