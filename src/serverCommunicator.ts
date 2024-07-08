@@ -16,6 +16,7 @@ interface Data {
 interface ExaminationToolMap {
     [key: string]: Set<string>;
 }
+export type { ExaminationToolMap, Data, ToolInfo };
 
 export async function fetchExaminationToolMap(): Promise<ExaminationToolMap> {
     try {

@@ -1,7 +1,7 @@
 import * as monaco from 'monaco-editor';
 
 self.MonacoEnvironment = {
-  getWorkerUrl: function (moduleId, label) {
+  getWorkerUrl: function (moduleId: string, label: string) {
     if (label === 'json') {
       return './json.worker.bundle.js';
     }
@@ -18,12 +18,12 @@ self.MonacoEnvironment = {
   }
 };
 
-export async function initializeMonacoEditor(languageId, elementId) {
-  const monaco = await import('monaco-editor');
+export async function initializeMonacoEditor(languageId: string, elementId: string): Promise<monaco.editor.IStandaloneCodeEditor> {
+  const monacoEditor = await import('monaco-editor');
 
-  monaco.languages.register({ id: languageId });
+  monacoEditor.languages.register({ id: languageId });
 
-  monaco.languages.setMonarchTokensProvider(languageId, {
+  monacoEditor.languages.setMonarchTokensProvider(languageId, {
     tokenizer: {
       root: [
         [/\b(true|false)\b/, 'keyword'],
@@ -37,7 +37,7 @@ export async function initializeMonacoEditor(languageId, elementId) {
     }
   });
 
-  const editor = monaco.editor.create(document.getElementById(elementId), {
+  const editor = monacoEditor.editor.create(document.getElementById(elementId) as HTMLElement, {
     value: '',
     language: languageId,
     theme: 'vs-dark',

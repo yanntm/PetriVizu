@@ -4,6 +4,8 @@ import PropertiesLexer from './antlr/PropertiesLexer';
 import PropertiesParser from './antlr/PropertiesParser';
 import PropertiesVisitor from './antlr/PropertiesVisitor';
 import { initializeMonacoEditor } from './monacoSetup';
+import { SharedState} from './sharedState';
+
 
 interface Error {
   line: number;
@@ -49,10 +51,10 @@ class IdentifierVisitor extends PropertiesVisitor<void> {
 }
 
 export default class BooleanExpressionEditor {
-  sharedState: any;
+  sharedState: SharedState;
   editor: monaco.editor.IStandaloneCodeEditor | null = null;
 
-  constructor(sharedState: any) {
+  constructor(sharedState: SharedState) {
     this.sharedState = sharedState;
     this.initializeEditor();
   }
@@ -108,7 +110,7 @@ parseBooleanExpression(input: string) {
 
   validateIdentifiers(tree: any) {
     const errors: Error[] = [];
-    const placeNames = this.sharedState.petriNet.reversePlaces;
+    const placeNames = this.sharedState.petriNet.placeNames;
     const visitor = new IdentifierVisitor(placeNames, errors);
     visitor.visit(tree);
     this.updateEditorMarkers(errors);
@@ -134,7 +136,7 @@ parseBooleanExpression(input: string) {
       endColumn: position.column
     });
 
-    const placeNames = this.sharedState.petriNet.reversePlaces;
+    const placeNames = this.sharedState.petriNet.placeNames;
     return placeNames.map((place: string) => ({
       label: place,
       kind: monaco.languages.CompletionItemKind.Variable,

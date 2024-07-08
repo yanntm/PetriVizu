@@ -1,22 +1,23 @@
-import { fetchExaminationToolMap, serverHelp } from './serverCommunicator';
+import { fetchExaminationToolMap, serverHelp, ExaminationToolMap } from './serverCommunicator';
 import { PropertyDefinition } from './propertyDefinition';
-
+import { SharedState} from './sharedState';
 
 export default class PropertyEditor {
-    constructor(sharedState) {
-        this.sharedState = sharedState;
+    private sharedState: SharedState;
+    private examinationToolMap: ExaminationToolMap;
 
+    constructor(sharedState: SharedState) {
+        this.sharedState = sharedState;
         this.examinationToolMap = {};
 
         this.setupEditorControls();
         this.init();
-        document.getElementById('helpButton').addEventListener('click', function() {
+        document.getElementById('helpButton')?.addEventListener('click', function() {
           window.open('https://github.com/yanntm/PetriVizu/blob/master/public/syntax.md', '_blank');
         });
-
     }
 
-    async init() {
+    async init(): Promise<void> {
         try {
             this.examinationToolMap = await fetchExaminationToolMap();
             this.populateExaminations();
@@ -25,14 +26,14 @@ export default class PropertyEditor {
         }
     }
 
-    setupEditorControls() {
-        document.getElementById('examination-selector').addEventListener('change', () => {
+    setupEditorControls(): void {
+        document.getElementById('examination-selector')?.addEventListener('change', () => {
             this.updateTools();
         });
     }
 
-    populateExaminations() {
-        const examinationSelector = document.getElementById('examination-selector');
+    populateExaminations(): void {
+        const examinationSelector = document.getElementById('examination-selector') as HTMLSelectElement;
         examinationSelector.innerHTML = '';
     
         Object.keys(this.examinationToolMap).forEach(exam => {
@@ -45,10 +46,9 @@ export default class PropertyEditor {
         this.updateTools();
     }
 
-
-    updateTools() {
-        const examinationSelector = document.getElementById('examination-selector');
-        const toolSelector = document.getElementById('tool-selector');
+    updateTools(): void {
+        const examinationSelector = document.getElementById('examination-selector') as HTMLSelectElement;
+        const toolSelector = document.getElementById('tool-selector') as HTMLSelectElement;
         const selectedExamination = examinationSelector.value;
 
         toolSelector.innerHTML = '';
@@ -63,18 +63,24 @@ export default class PropertyEditor {
         }
     }
 
-    handleError(error) {
-        const stderrElem = document.getElementById('stderr');
+    handleError(error: unknown): void {
+        const stderrElem = document.getElementById('stderr') as HTMLTextAreaElement;
         stderrElem.value = serverHelp();
         alert(serverHelp());
         console.error('Error:', error);
     }
 
-    activate() {
-        document.getElementById('property-configuration').style.display = 'block';
+    activate(): void {
+        const propertyConfig = document.getElementById('property-configuration') as HTMLElement;
+        if (propertyConfig) {
+            propertyConfig.style.display = 'block';
+        }
     }
 
-    deactivate() {
-        document.getElementById('property-configuration').style.display = 'none';
+    deactivate(): void {
+        const propertyConfig = document.getElementById('property-configuration') as HTMLElement;
+        if (propertyConfig) {
+            propertyConfig.style.display = 'none';
+        }
     }
 }
