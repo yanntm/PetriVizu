@@ -1,4 +1,4 @@
-// modeInterface.js
+// modeInterface
 export default class Mode {
     activate() {
         throw new Error('Method not implemented.');

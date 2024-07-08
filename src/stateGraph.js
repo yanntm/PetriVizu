@@ -1,4 +1,4 @@
-// stateGraph.js
+// stateGraph
 
 class StateGraph {
     constructor(petriNet) {

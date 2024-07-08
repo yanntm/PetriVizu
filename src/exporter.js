@@ -1,4 +1,4 @@
-// exporter.js
+// exporter
 import { PetriNet } from './petriNetModel';
 
 export function exportToPNMLContent(petriNet) {

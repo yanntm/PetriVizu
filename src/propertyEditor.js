@@ -1,5 +1,5 @@
 import { fetchExaminationToolMap, serverHelp } from './serverCommunicator';
-import { PropertyDefinition } from './propertyDefinition.js';
+import { PropertyDefinition } from './propertyDefinition';
 
 
 export default class PropertyEditor {

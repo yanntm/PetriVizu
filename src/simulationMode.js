@@ -1,9 +1,9 @@
-// simulationMode.js
+// simulationMode
 
-import AbstractMode from './abstractMode.js';
-import { createCytoscapeElements, syncGraphicsFromCy, initCytoscape } from './cytoscapeUtils.js';
-import Trace from './trace.js';
-import StateGraphView from './stateGraphView.js';
+import AbstractMode from './abstractMode';
+import { createCytoscapeElements,  } from './cytoscapeUtils';
+import Trace from './trace';
+import StateGraphView from './stateGraphView';
 
 export default class SimulationMode extends AbstractMode {
     constructor(sharedState, stateGraphView) {

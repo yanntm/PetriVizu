@@ -1,4 +1,4 @@
-// stateGraphView.js
+// stateGraphView
 
 import cytoscape from 'cytoscape';
 import StateGraph from './stateGraph';

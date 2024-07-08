@@ -1,5 +1,5 @@
-import PropertyEditor from './propertyEditor.js';
-import PropertyLauncher from './propertyLauncher.js';
+import PropertyEditor from './propertyEditor';
+import PropertyLauncher from './propertyLauncher';
 
 
 export default class AnalysisMode {

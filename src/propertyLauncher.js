@@ -1,4 +1,4 @@
-import { PropertyResult } from './propertyResultModel.js';
+import { PropertyResult } from './propertyResultModel';
 import { runAnalysis, serverHelp } from './serverCommunicator';
 
 const EXAMINATIONS_WITHOUT_XML = ["StateSpace", "OneSafe", "StableMarking", "QuasiLiveness", "Liveness", "ReachabilityDeadlock"];

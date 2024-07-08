@@ -1,7 +1,7 @@
-import AbstractMode from './abstractMode.js';
-import { loadPetriNet } from './loader.js';
-import { updateCytoscapeCommon } from './cytoscapeUtils.js';
-import { exportToPNML } from './exporter.js';
+import AbstractMode from './abstractMode';
+import { loadPetriNet } from './loader';
+import { updateCytoscapeCommon } from './cytoscapeUtils';
+import { exportToPNML } from './exporter';
 
 export default class ViewMode extends AbstractMode {
     constructor(sharedState) {

@@ -1,4 +1,4 @@
-import { Graphics } from './graphics.js';
+import { Graphics } from './graphics';
 
 function alphanumericSort(a, b) {
     const regex = /(.*?)(\d+)?$/;

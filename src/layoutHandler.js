@@ -1,4 +1,4 @@
-// layoutHandler.js
+// layoutHandler
 import cytoscape from 'cytoscape';
 
 import fcose from 'cytoscape-fcose';

@@ -1,7 +1,7 @@
-// abstractMode.js
+// abstractMode
 import cytoscape from 'cytoscape';
 import cytoscapeStyles from './cytoscapeStyles';
-import { syncGraphicsFromCy } from './cytoscapeUtils.js';
+import { syncGraphicsFromCy } from './cytoscapeUtils';
 
 
 export default class AbstractMode {
@@ -21,7 +21,6 @@ export default class AbstractMode {
         });
     }
 
-// abstractMode.js
 layout(layoutName) {
     const layout = this.cy.layout({ name: layoutName, padding: 10 });
     layout.run();

@@ -1,4 +1,4 @@
-import { exportToPNMLContent } from './exporter.js';
+import { exportToPNMLContent } from './exporter';
 
 export default class PropertyMode {
     constructor(sharedState) {
