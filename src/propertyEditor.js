@@ -3,9 +3,8 @@ import { PropertyDefinition } from './propertyDefinition';
 
 
 export default class PropertyEditor {
-    constructor(sharedState, onSave) {
+    constructor(sharedState) {
         this.sharedState = sharedState;
-        this.onSave = onSave;
 
         this.examinationToolMap = {};
 
@@ -27,16 +26,6 @@ export default class PropertyEditor {
     }
 
     setupEditorControls() {
-        document.getElementById('save-property').addEventListener('click', () => {
-            const name = document.getElementById('property-name').value;
-            const examination = document.getElementById('examination-selector').value;
-            const tool = document.getElementById('tool-selector').value;
-            const timeout = parseInt(document.getElementById('timeout').value);
-
-            const property = new PropertyDefinition(name, examination, tool, timeout);
-            this.onSave(property);
-        });
-
         document.getElementById('examination-selector').addEventListener('change', () => {
             this.updateTools();
         });

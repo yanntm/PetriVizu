@@ -1,11 +1,9 @@
 // editMode
 import AbstractMode from './abstractMode';
 import cytoscape from 'cytoscape';
-import edgehandles from 'cytoscape-edgehandles';
-import { PetriNet } from './petriNetModel';
-import { initCytoscape, updateCytoscapeCommon,syncGraphicsFromCy } from './cytoscapeUtils';
 
-cytoscape.use(edgehandles);
+import { updateCytoscapeCommon } from './cytoscapeUtils';
+
 
 export default class EditMode extends AbstractMode {
     constructor(sharedState) {

@@ -2,13 +2,12 @@ import ViewMode from './viewMode';
 import EditMode from './editMode';
 import SimulationMode from './simulationMode';
 import AnalysisMode from './analysisMode';
-import PropertyMode from './propertyMode';
-import BooleanExpressionEditor from './booleanExpressionEditor';
+
 import {SharedState } from './sharedState';
 import LayoutHandler from './layoutHandler';
 import { buildExample } from './example';
 
-type Mode = ViewMode | EditMode | SimulationMode | AnalysisMode | PropertyMode;
+export type Mode = ViewMode | EditMode | SimulationMode | AnalysisMode;
 
 let currentMode: Mode | null = null;
 
@@ -19,9 +18,7 @@ const sharedState: SharedState = {
 const viewMode = new ViewMode(sharedState);
 const editMode = new EditMode(sharedState);
 const simulationMode = new SimulationMode(sharedState);
-const booleanExpressionEditor = new BooleanExpressionEditor(sharedState);
-const analysisMode = new AnalysisMode(sharedState, booleanExpressionEditor);
-const propertyMode = new PropertyMode(sharedState);
+const analysisMode = new AnalysisMode(sharedState);
 const layoutHandler = new LayoutHandler();
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -62,8 +59,6 @@ function switchTab(tabName: string) {
         currentMode = simulationMode;
     } else if (tabName === 'analysis') {
         currentMode = analysisMode;
-    } else if (tabName === 'property') {
-        currentMode = propertyMode;
     }
 
     requestAnimationFrame(() => {
