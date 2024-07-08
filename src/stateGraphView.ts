@@ -1,21 +1,30 @@
-// stateGraphView
 import StateGraph from './stateGraph';
-
 import cytoscape, { Core } from 'cytoscape';
 import fcose from 'cytoscape-fcose';
 import dagre from 'cytoscape-dagre';
+import { SharedState } from './sharedState';
+import { WalkUtils } from './walkUtils';
 
 cytoscape.use(fcose);
 cytoscape.use(dagre);
 
 class StateGraphView {
-    constructor(containerId, sharedState) {
+    private cy: Core;
+    public stateGraph: StateGraph;
+    private sharedState: SharedState;
+    private exploredStates: Set<number>;
+    private currentStateId: number | null;
+    private listeners: Array<(state: number[]) => void>;
+    private walkUtils: WalkUtils;
+
+    constructor(containerId: string, sharedState: SharedState) {
         this.stateGraph = new StateGraph(sharedState.petriNet);
         this.sharedState = sharedState;
         this.cy = this.initCytoscape(containerId);
         this.exploredStates = new Set(); // Set to track explored states
         this.currentStateId = null; // Track the current state ID
         this.listeners = []; // List of listeners for state clicks
+        this.walkUtils = new WalkUtils(sharedState.petriNet); // Instantiate WalkUtils
 
         // Initialize the layout control
         this.initializeLayoutControl();
@@ -23,7 +32,7 @@ class StateGraphView {
         this.setupClickListener();
     }
 
-    initCytoscape(containerId) {
+    private initCytoscape(containerId: string): Core {
         return cytoscape({
             container: document.getElementById(containerId),
             style: [
@@ -34,12 +43,10 @@ class StateGraphView {
                         'text-valign': 'center',
                         'text-halign': 'center',
                         'background-color': 'data(color)',
-                        'border-style': 'data(borderStyle)',
                         'border-width': '2px',
                         'width': 'label',
                         'height': 'label',
                         'shape': 'roundrectangle',
-                        'padding': '10px'
                     }
                 },
                 {
@@ -55,21 +62,20 @@ class StateGraphView {
                 }
             ],
             layout: {
-                name: 'grid',
-                padding: 10
+                name: 'cose'
             }
         });
     }
 
-    initializeLayoutControl() {
-        const layoutDropdown = document.getElementById('layout-dropdown');
+    private initializeLayoutControl(): void {
+        const layoutDropdown = document.getElementById('layout-dropdown') as HTMLSelectElement;
         layoutDropdown.addEventListener('change', () => {
             this.applyLayout(layoutDropdown.value);
         });
     }
 
-    applyLayout(layoutName) {
-        this.cy.layout({ name: layoutName, padding: 10 }).run();
+    public applyLayout(layoutName: string): void {
+        this.cy.layout({ name: layoutName }).run();
         requestAnimationFrame(() => {
             this.cy.fit();
         });
@@ -78,25 +84,26 @@ class StateGraphView {
         });
     }
 
-
-    setupClickListener() {
+    private setupClickListener(): void {
         this.cy.on('tap', 'node', (event) => {
             const stateId = parseInt(event.target.id().replace('state', ''), 10);
             const state = this.stateGraph.getState(stateId);
-            this.updateCurrentState(state);
-            this.notifyListeners(state);
+            if (state) {
+                this.updateCurrentState(state);
+                this.notifyListeners(state);
+            }
         });
     }
 
-    notifyListeners(state) {
+    private notifyListeners(state: number[]): void {
         this.listeners.forEach(listener => listener(state));
     }
 
-    addStateClickListener(listener) {
+    addStateClickListener(listener: (state: number[]) => void): void {
         this.listeners.push(listener);
     }
 
-    addState(state) {
+    addState(state: number[]): void {
         const stateId = this.stateGraph.getId(state);
         const label = this.stateGraph.getStateLabel(stateId);
         this.cy.add({
@@ -112,10 +119,10 @@ class StateGraphView {
                 'border-color': stateId === this.stateGraph.getInitialStateId() ? 'blue' : 'black'
             }
         });
-        this.applyLayout(document.getElementById('layout-dropdown').value); // Apply layout after adding state
+        this.applyLayout((document.getElementById('layout-dropdown') as HTMLSelectElement).value); // Apply layout after adding state
     }
 
-    addTransition(sourceId, destinationId, transitionId) {
+    addTransition(sourceId: number, destinationId: number, transitionId: string): void {
         this.stateGraph.addEdge(sourceId, destinationId, transitionId);
         this.cy.add({
             group: 'edges',
@@ -126,59 +133,62 @@ class StateGraphView {
                 label: transitionId
             }
         });
-        this.applyLayout(document.getElementById('layout-dropdown').value); // Apply layout after adding transition
+        this.applyLayout((document.getElementById('layout-dropdown') as HTMLSelectElement).value); // Apply layout after adding transition
     }
 
-    updateCurrentState(state) {
+    updateCurrentState(state: number[]): void {
         const nbstates = this.stateGraph.listAllStates().length;
         const stateId = this.stateGraph.getId(state);
         if (stateId === nbstates) {
-           this.addState(state);
+            this.addState(state);
         }
-        
+
         this.currentStateId = stateId;
-        
-        if (!this.exploredStates.has(stateId)) {            
+
+        if (!this.exploredStates.has(stateId)) {
             this.exploreState(stateId);
         }
         this.cy.nodes().forEach(node => {
             node.data('color', node.id() === `state${stateId}` ? '#90ee90' : '#d3d3d3'); // Light green for current state, light gray for others
         });
     }
-
-    exploreState(stateId) {
+    
+    exploreState(stateId: number): void {
         if (this.exploredStates.has(stateId)) return;
-        
+    
         this.exploredStates.add(stateId);
         const state = this.stateGraph.getState(stateId); // Retrieve the actual state vector
-        const enabledTransitions = this.sharedState.petriNet.getEnabledTransitions(state);
-        
-        enabledTransitions.forEach(transitionId => {
-            const successorState = this.sharedState.petriNet.fireTransition(state, transitionId);
-            const nbstates = this.stateGraph.listAllStates().length;
-            const successorStateId = this.stateGraph.getId(successorState);
-            if (this.stateGraph.getId(successorState) === nbstates) {
-                this.addState(successorState);
-            }
-            this.addTransition(stateId, successorStateId, transitionId);
-            if (!this.cy.getElementById(`state${successorStateId}`).length) {
-                this.addState(successorState);
-            }
-        });
-        
-        const stateLabel = this.stateGraph.getStateLabel(stateId);
-        this.updateStateNode(stateId, stateLabel, 'solid');
+        if (state) {
+            const enabledTransitions = this.walkUtils.getEnabledTransitions(state);
+    
+            enabledTransitions.forEach(transitionId => {
+                const successorState = this.walkUtils.fireTransition(state, transitionId);
+                const nbstates = this.stateGraph.listAllStates().length;
+                const successorStateId = this.stateGraph.getId(successorState);
+                if (this.stateGraph.getId(successorState) === nbstates) {
+                    this.addState(successorState);
+                }
+                this.addTransition(stateId, successorStateId, transitionId);
+                if (!this.cy.getElementById(`state${successorStateId}`).length) {
+                    this.addState(successorState);
+                }
+            });
+    
+            const stateLabel = this.stateGraph.getStateLabel(stateId) || '';
+            this.updateStateNode(stateId, stateLabel, 'solid');
+        }
     }
 
-    updateStateNode(stateId, label, borderStyle) {
+
+    updateStateNode(stateId: number, label: string, borderStyle: string): void {
         const node = this.cy.getElementById(`state${stateId}`);
         if (node) {
             node.data('label', label);
             node.data('borderStyle', borderStyle);
         }
     }
-    
-    clear() {
+
+    clear(): void {
         this.stateGraph = new StateGraph(this.sharedState.petriNet);
         this.exploredStates = new Set();
         this.cy.elements().remove();

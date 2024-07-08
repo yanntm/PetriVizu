@@ -61,11 +61,11 @@ class PetriNet {
         const target = this.nodes.get(targetId);
 
         if (!source || !target) {
-            throw new Error("Invalid arc: source and target must be valid nodes.");
+            throw Error("Invalid arc: source and target must be valid nodes.");
         }
 
         if (source.type === target.type) {
-            throw new Error("Invalid arc: source and target must be of different types (place and transition).");
+            throw Error("Invalid arc: source and target must be of different types (place and transition).");
         }
 
         if (source.type === NodeType.Transition) {
@@ -85,11 +85,11 @@ class PetriNet {
 
     private renameNode(oldId: string, newId: string): void {
         if (this.nodes.has(newId)) {
-            throw new Error(`Node with ID ${newId} already exists.`);
+            throw Error(`Node with ID ${newId} already exists.`);
         }
         const node = this.nodes.get(oldId);
         if (!node) {
-            throw new Error(`Node ${oldId} does not exist.`);
+            throw Error(`Node ${oldId} does not exist.`);
         }
         node.id = newId;
         this.nodes.delete(oldId);
@@ -104,7 +104,7 @@ class PetriNet {
     deletePlace(id: string): void {
         const node = this.nodes.get(id);
         if (!node || node.type !== NodeType.Place) {
-            throw new Error(`Place ${id} does not exist.`);
+            throw Error(`Place ${id} does not exist.`);
         }
         const index = node.index;
 
@@ -140,7 +140,7 @@ class PetriNet {
     deleteTransition(id: string): void {
         const node = this.nodes.get(id);
         if (!node || node.type !== NodeType.Transition) {
-            throw new Error(`Transition ${id} does not exist.`);
+            throw Error(`Transition ${id} does not exist.`);
         }
         const index = node.index;
 
@@ -163,7 +163,7 @@ class PetriNet {
         const target = this.nodes.get(targetId);
 
         if (!source || !target) {
-            throw new Error("Invalid arc: source and target must be valid nodes.");
+            throw Error("Invalid arc: source and target must be valid nodes.");
         }
 
         if (source.type === NodeType.Transition) {
@@ -180,7 +180,7 @@ class PetriNet {
         if (placeIndex !== undefined) {
             this.initialState[placeIndex] = newTokens;
         } else {
-            throw new Error(`Place with ID ${placeId} does not exist.`);
+            throw Error(`Place with ID ${placeId} does not exist.`);
         }
     }
 
@@ -189,7 +189,7 @@ class PetriNet {
         const target = this.nodes.get(targetId);
 
         if (!source || !target) {
-            throw new Error("Invalid arc: source and target must be valid nodes.");
+            throw Error("Invalid arc: source and target must be valid nodes.");
         }
 
         if (source.type === NodeType.Transition) {
@@ -215,11 +215,19 @@ class PetriNet {
         }
     }
     
+    getNode(id: string): Node {
+        const node = this.nodes.get(id);
+        if (!node) {
+            throw new Error(`Node with ID ${id} does not exist.`);
+        }
+        return node;
+    }
+
     
     getPosition(id: string): Position {
         const node = this.nodes.get(id);
         if (!node) {
-            throw new Error(`Node with ID ${id} does not exist.`);
+            throw Error(`Node with ID ${id} does not exist.`);
         }
         return node.graphics;
     }
@@ -227,7 +235,7 @@ class PetriNet {
     setPosition(id: string, pos: Position): void {
         const node = this.nodes.get(id);
         if (!node) {
-            throw new Error(`Node with ID ${id} does not exist.`);
+            throw Error(`Node with ID ${id} does not exist.`);
         }
         node.graphics = pos;
     }

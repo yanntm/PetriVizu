@@ -25,7 +25,7 @@ function createCytoscapeElements(petriNet: PetriNet, options: CytoscapeOptions =
                 label: label
             },
             position: position,
-            classes: node.type === NodeType.Place ? 'place' : 'transition'
+            classes: node.type === NodeType.Place ? ['place' ] : ['transition']
         });
     });
 
@@ -52,9 +52,12 @@ function updateCytoscapeCommon(cy: Core, petriNet: PetriNet, showAllLabels: bool
 function syncGraphicsFromCy(cy: Core, petriNet: PetriNet): void {
     cy.nodes().forEach(node => {
         const position = node.position();
-        petriNet.setPosition(node.id(), position);
+        const labelParts = node.data('label').split('\n');
+        const id = labelParts[0];  // Extract the id/name from the label
+        petriNet.setPosition(id, position);
     });
 }
+
 
 function initCytoscape(containerId: string): Core {
     const cy = cytoscape({
