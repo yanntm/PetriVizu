@@ -1,4 +1,6 @@
-const cytoscapeStyles = [
+import { Stylesheet } from 'cytoscape';
+
+const cytoscapeStyles: Stylesheet[] = [
   {
     selector: 'node.place',
     style: {

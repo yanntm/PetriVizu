@@ -1,6 +1,6 @@
 // abstractMode.js
 import cytoscape from 'cytoscape';
-import cytoscapeStyles from './cytoscapeStyles.js';
+import cytoscapeStyles from './cytoscapeStyles';
 import { syncGraphicsFromCy } from './cytoscapeUtils.js';
 
 
