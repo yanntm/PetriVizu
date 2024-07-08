@@ -3,6 +3,7 @@ import { loadPetriNet } from './loader';
 import { updateCytoscapeCommon } from './cytoscapeUtils';
 import { exportToPNML } from './exporter';
 import { SharedState } from './sharedState';
+import { reorderNet } from './netOrderProvider';
 
 export default class ViewMode extends AbstractMode {
     constructor(sharedState: SharedState) {
@@ -84,7 +85,7 @@ export default class ViewMode extends AbstractMode {
 
     loadPNMLContent(content: string): void {
         this.sharedState.petriNet = loadPetriNet(content);
-        this.sharedState.petriNet.reorder();
+        this.sharedState.petriNet = reorderNet(this.sharedState.petriNet);
         updateCytoscapeCommon(this.cy, this.sharedState.petriNet);
         const layoutDropdown = document.getElementById('layout-dropdown') as HTMLSelectElement;
         const selectedLayout = layoutDropdown.value;

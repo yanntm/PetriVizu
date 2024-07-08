@@ -234,6 +234,6 @@ class PetriNet {
 
 }
 
-export { PetriNet };
-export type { State, NodeType, Node, Arc, Position };
+export { PetriNet, NodeType };
+export type { State, Node, Arc, Position };
 
