@@ -1,7 +1,12 @@
 // stateGraphView
-
-import cytoscape from 'cytoscape';
 import StateGraph from './stateGraph';
+
+import cytoscape, { Core } from 'cytoscape';
+import fcose from 'cytoscape-fcose';
+import dagre from 'cytoscape-dagre';
+
+cytoscape.use(fcose);
+cytoscape.use(dagre);
 
 class StateGraphView {
     constructor(containerId, sharedState) {
