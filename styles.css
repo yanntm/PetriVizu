@@ -1,0 +1,251 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #ccc;
+}
+
+.tab-menu {
+    display: flex;
+}
+
+.tab-button {
+    margin-right: 10px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.tab-button:hover {
+    background-color: #45a049;
+}
+
+#layout-tools {
+    display: flex;
+    align-items: center;
+}
+
+#layout-tools button,
+#layout-tools select {
+    margin-left: 10px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.tab-content {
+    display: none;
+    padding: 10px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+#viewer-cy, #editor-cy, #simulation-cy {
+    width: 100%;
+    height: 600px;
+    border: 1px solid #ccc;
+}
+
+#palette {
+    margin-bottom: 10px;
+}
+
+#simulation-controls {
+    width: 20%;
+    height: 100%;
+    float: left;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-right: 1px solid #ccc;
+}
+#simulation-controls {
+    width: 20%;
+    height: 100%;
+    float: left;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-right: 1px solid #ccc;
+}
+
+#simulation-controls div,
+#simulation-controls textarea,
+#simulation-controls button {
+    margin-bottom: 2px;
+}
+
+#enabled-transitions,
+#current-state,
+#trace {
+    padding: 10px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    overflow-y: auto;
+}
+
+#enabled-transitions {
+    height: 150px;
+}
+
+#current-state {
+    width: calc(100% - 22px);
+    height: 100px;
+    resize: none;
+}
+
+#trace {
+    height: 300px;
+}
+
+#enabled-transitions:before,
+#current-state-wrapper:before,
+#trace:before {
+    content: attr(title);
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+}
+
+#reset {
+    width: 100%;
+    padding: 5px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+#reset:hover {
+    background-color: #45a049;
+}
+
+#simulation-visualization-container {
+    display: flex;
+    width: 75%;
+    height: 100%;
+    float: left;
+    padding: 0;
+    background-color: #fff;
+    border-left: 1px solid #ccc;
+    box-sizing: border-box; /* Add this */
+}
+
+#simulation-cy-container, #state-graph-cy-container {
+    flex: 1;
+    padding: 0;
+    background-color: #fff;
+    box-sizing: border-box; /* Add this */
+}
+
+#simulation-cy, #state-graph-cy {
+    width: 100%;
+    height: 600px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    box-sizing: border-box; /* Add this */
+}
+#analysis-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.control-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.formula-editor {
+    flex-grow: 1;
+    height: 150px;  /* Adjust this value as necessary */
+    border: 1px solid #ccc;
+}
+
+.run-button {
+    padding: 5px 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-left: 10px;
+    height: 30px;
+}
+
+.run-button:hover {
+    background-color: #45a049;
+}
+
+/* Style for the results div */
+#results {
+    margin-top: 20px;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+/* Style for individual result rows */
+.result-row {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #ddd;
+    padding: 8px 0;
+}
+
+/* Style for formula column */
+.result-formula {
+    flex: 1;
+    padding: 8px;
+    text-align: left;
+}
+
+/* Style for value column */
+.result-value {
+    flex: 1;
+    padding: 8px;
+    text-align: right;
+    font-weight: bold;
+}
+
+/* Style for alternating row colors */
+.result-row:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Style for hover effect on rows */
+.result-row:hover {
+    background-color: #f1f1f1;
+}
+
+/* Additional styling for better readability */
+#results h3 {
+    margin-bottom: 10px;
+}
+
+#output-wrapper textarea {
+    width: 100%;
+    height: 150px;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: none;
+}
+
+.vertical-container {
+    display: flex;
+    flex-direction: column;
+}
