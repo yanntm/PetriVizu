@@ -62,7 +62,6 @@ export default class SimulationMode extends AbstractMode {
     }
 
     jumpToState(state: State): void {
-        console.log(`[Sim] Jumping to state: ${JSON.stringify(state)}`);
         this.trace.clear();
         this.currentState = state;
         this.updateCytoShownState();

@@ -50,6 +50,18 @@ class StateGraphView {
                     }
                 },
                 {
+                    selector: 'node[borderStyle = "solid"]',
+                    style: {
+                        'border-style': 'solid'
+                    }
+                },
+                {
+                    selector: 'node[borderStyle = "dashed"]',
+                    style: {
+                        'border-style': 'dashed'
+                    }
+                },
+                {
                     selector: 'edge',
                     style: {
                         'label': 'data(label)',
@@ -106,6 +118,7 @@ class StateGraphView {
     addState(state: number[]): void {
         const stateId = this.stateGraph.getId(state);
         const label = this.stateGraph.getStateLabel(stateId);
+        console.log(`[StateGraphView] Adding state node to Cytoscape. ID: ${stateId}, Label: "${label}"`);
         this.cy.add({
             group: 'nodes',
             data: { 
@@ -123,6 +136,7 @@ class StateGraphView {
     }
 
     addTransition(sourceId: number, destinationId: number, transitionId: string): void {
+        console.log(`[StateGraphView] Adding edge to Cytoscape: ${sourceId} -> ${destinationId} (transition: ${transitionId})`);
         this.stateGraph.addEdge(sourceId, destinationId, transitionId);
         this.cy.add({
             group: 'edges',
@@ -156,10 +170,12 @@ class StateGraphView {
     exploreState(stateId: number): void {
         if (this.exploredStates.has(stateId)) return;
     
+        console.log(`[StateGraphView] Exploring state ${stateId}`);
         this.exploredStates.add(stateId);
         const state = this.stateGraph.getState(stateId); // Retrieve the actual state vector
         if (state) {
             const enabledTransitions = this.walkUtils.getEnabledTransitions(state);
+            console.log(`[StateGraphView] State ${stateId} has enabled transitions: ${enabledTransitions.join(', ')}`);
     
             enabledTransitions.forEach(transitionId => {
                 const successorState = this.walkUtils.fireTransition(state, transitionId);
@@ -181,6 +197,7 @@ class StateGraphView {
 
 
     updateStateNode(stateId: number, label: string, borderStyle: string): void {
+        console.log(`[StateGraphView] Updating state node ${stateId}: label="${label}", borderStyle="${borderStyle}"`);
         const node = this.cy.getElementById(`state${stateId}`);
         if (node) {
             node.data('label', label);
@@ -192,6 +209,7 @@ class StateGraphView {
         this.stateGraph = new StateGraph(this.sharedState.petriNet);
         this.exploredStates = new Set();
         this.cy.elements().remove();
+        this.walkUtils = new WalkUtils(this.sharedState.petriNet); // Re-initialize WalkUtils
     }
 }
 

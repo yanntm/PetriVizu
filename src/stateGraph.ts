@@ -27,10 +27,13 @@ class StateGraph {
     getId(state: State): number {
         const stateKey = JSON.stringify(state); // Convert the state to a string key
         if (!this.states.has(stateKey)) {
-            this.states.set(stateKey, this.stateCounter);
-            this.stateVectors[this.stateCounter] = state.slice(); // Store the state vector
-            this.successors[this.stateCounter] = []; // Initialize the successor list for the new state
-            this.labels[this.stateCounter] = this.computeLabel(state); // Compute and store the label
+            const newId = this.stateCounter;
+            this.states.set(stateKey, newId);
+            this.stateVectors[newId] = state.slice(); // Store the state vector
+            this.successors[newId] = []; // Initialize the successor list for the new state
+            const newLabel = this.computeLabel(state);
+            this.labels[newId] = newLabel; // Compute and store the label
+            console.log(`[StateGraph] New state created. ID: ${newId}, Key: ${stateKey}, Label: "${newLabel}"`);
             this.stateCounter++;
         }
         return this.states.get(stateKey)!;
@@ -55,7 +58,8 @@ class StateGraph {
     }
 
     getState(stateId: number): State | null {
-        return this.stateVectors[stateId] || null;
+        const state = this.stateVectors[stateId] || null;
+        return state;
     }
 
     getStateLabel(stateId: number): string | null {
