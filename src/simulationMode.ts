@@ -25,8 +25,10 @@ export default class SimulationMode extends AbstractMode {
     }
 
     activate(): void {
+        console.log("[Sim] Activating simulation mode.");
         this.stateGraphView.clear();
         this.currentState = this.sharedState.petriNet.initialState.slice();
+        console.log(`[Sim] Initial state: ${JSON.stringify(this.currentState)}`);
         this.walkUtils = new WalkUtils(this.sharedState.petriNet);
         updateCytoscapeCommon(this.cy, this.sharedState.petriNet, false);
         this.updateCytoShownState();
@@ -60,6 +62,7 @@ export default class SimulationMode extends AbstractMode {
     }
 
     jumpToState(state: State): void {
+        console.log(`[Sim] Jumping to state: ${JSON.stringify(state)}`);
         this.trace.clear();
         this.currentState = state;
         this.updateCytoShownState();
@@ -141,13 +144,20 @@ export default class SimulationMode extends AbstractMode {
     }
 
     fireTransition(transitionId: string): void {
-        const previousState = this.currentState;
+        const previousState = this.currentState.slice();
+        const sourceStateId = this.stateGraphView.stateGraph.getId(previousState);
+        console.log(`[Sim] Firing transition: "${transitionId}"`);
+        console.log(`[Sim] State BEFORE firing (ID: ${sourceStateId}): ${JSON.stringify(previousState)}`);
+
         this.currentState = this.walkUtils.fireTransition(this.currentState, transitionId);
+        const destinationStateId = this.stateGraphView.stateGraph.getId(this.currentState);
+        console.log(`[Sim] State AFTER firing (ID: ${destinationStateId}):  ${JSON.stringify(this.currentState)}`);
+
         this.trace.addTransition(transitionId);
         this.stateGraphView.updateCurrentState(this.currentState);
-        const sourceStateId = this.stateGraphView.stateGraph.getId(previousState);
-        const destinationStateId = this.stateGraphView.stateGraph.getId(this.currentState);
         
+        console.log(`[Sim] Edge in StateGraph: ${sourceStateId} -> ${destinationStateId}`);
+
         this.stateGraphView.updateCurrentState(this.currentState);
         this.updateCytoShownState();
         this.updateEnabled();
