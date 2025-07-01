@@ -55,8 +55,10 @@ export default class EditMode extends AbstractMode {
         });
 
         this.cy.on('ehcomplete', (event, sourceNode, targetNode, addedEdge) => {
-            console.log('Edge added:', sourceNode.id(), targetNode.id(), addedEdge.id());
-            this.addArc(sourceNode.id(), targetNode.id(), 1);
+            const sourceLabel = sourceNode.data('label').split('\n')[0];
+            const targetLabel = targetNode.data('label').split('\n')[0];
+            console.log('Edge added (labels):', sourceLabel, targetLabel, addedEdge.id());
+            this.addArc(sourceLabel, targetLabel, 1);
         });
     }
 
