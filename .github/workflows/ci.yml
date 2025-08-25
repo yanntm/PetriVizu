@@ -15,12 +15,13 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '22'
-    - name: Deploy antlr
+        cache: 'npm'
+    - name: Install ANTLR
       run: pip install antlr4-tools
     - name: Build project
       run: npm install && npm run build
     - name: Deploy to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@v4.6.3
+      uses: JamesIves/github-pages-deploy-action@v4.7.3
       with:
         branch: gh-pages # The branch the action should deploy to.
         folder: website/ # The folder the action should deploy.
