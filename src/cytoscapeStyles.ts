@@ -1,9 +1,9 @@
-import { Stylesheet } from 'cytoscape';
+import { StylesheetCSS as Stylesheet } from 'cytoscape';
 
 const cytoscapeStyles: Stylesheet[] = [
   {
     selector: 'node.place',
-    style: {
+    css: {
       'shape': 'ellipse',
       'background-color': 'white',
       'border-color': 'black',
@@ -18,7 +18,7 @@ const cytoscapeStyles: Stylesheet[] = [
   },
   {
     selector: 'node.transition',
-    style: {
+    css: {
       'shape': 'rectangle',
       'background-color': 'white', // Non-filled rectangle with white background
       'border-color': 'black',
@@ -33,7 +33,7 @@ const cytoscapeStyles: Stylesheet[] = [
   },
   {
     selector: 'edge',
-    style: {
+    css: {
       'width': 2,
       'line-color': 'black',
       'target-arrow-color': 'black',
@@ -45,7 +45,7 @@ const cytoscapeStyles: Stylesheet[] = [
   },
   {
     selector: 'edge[label]',
-    style: {
+    css: {
       'label': 'data(label)', // Apply label style only if label is present
     }
   }
