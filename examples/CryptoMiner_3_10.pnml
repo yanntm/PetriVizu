@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+  <net type="http://www.pnml.org/version-2009/grammar/ptnet" id="CryptoMiner-PT-D03N010">
+    <name>
+      <text>CryptoMiner-PT-D03N010</text>
+    </name>
+    <page id="page">
+      <place id="capacity_c0">
+        <name>
+          <text>capacity_c0</text>
+        </name>
+        <initialMarking>
+          <text>10</text>
+        </initialMarking>
+      </place>
+      <place id="capacity_c1">
+        <name>
+          <text>capacity_c1</text>
+        </name>
+      </place>
+      <place id="capacity_c2">
+        <name>
+          <text>capacity_c2</text>
+        </name>
+      </place>
+      <place id="capacity_c3">
+        <name>
+          <text>capacity_c3</text>
+        </name>
+      </place>
+      <place id="resource_c0">
+        <name>
+          <text>resource_c0</text>
+        </name>
+      </place>
+      <place id="resource_c1">
+        <name>
+          <text>resource_c1</text>
+        </name>
+      </place>
+      <place id="resource_c2">
+        <name>
+          <text>resource_c2</text>
+        </name>
+      </place>
+      <place id="resource_c3">
+        <name>
+          <text>resource_c3</text>
+        </name>
+      </place>
+      <place id="state_c0">
+        <name>
+          <text>state_c0</text>
+        </name>
+        <initialMarking>
+          <text>1</text>
+        </initialMarking>
+      </place>
+      <place id="state_c1">
+        <name>
+          <text>state_c1</text>
+        </name>
+      </place>
+      <place id="state_c2">
+        <name>
+          <text>state_c2</text>
+        </name>
+      </place>
+      <place id="state_c3">
+        <name>
+          <text>state_c3</text>
+        </name>
+      </place>
+      <transition id="Compute_0">
+        <name>
+          <text>Compute_0</text>
+        </name>
+      </transition>
+      <arc id="p2t-0-9" source="capacity_c1" target="Compute_0"/>
+      <arc id="p2t-0-5" source="resource_c1" target="Compute_0"/>
+      <arc id="p2t-0-1" source="state_c1" target="Compute_0"/>
+      <arc id="t2p-6-0" source="Compute_0" target="resource_c2"/>
+      <arc id="t2p-1-0" source="Compute_0" target="state_c1"/>
+      <transition id="Compute_1">
+        <name>
+          <text>Compute_1</text>
+        </name>
+      </transition>
+      <arc id="p2t-1-10" source="capacity_c2" target="Compute_1"/>
+      <arc id="p2t-1-6" source="resource_c2" target="Compute_1"/>
+      <arc id="p2t-1-2" source="state_c2" target="Compute_1"/>
+      <arc id="t2p-7-1" source="Compute_1" target="resource_c3"/>
+      <arc id="t2p-2-1" source="Compute_1" target="state_c2"/>
+      <transition id="Compute_2">
+        <name>
+          <text>Compute_2</text>
+        </name>
+      </transition>
+      <arc id="p2t-2-11" source="capacity_c3" target="Compute_2"/>
+      <arc id="p2t-2-7" source="resource_c3" target="Compute_2"/>
+      <arc id="p2t-2-3" source="state_c3" target="Compute_2"/>
+      <arc id="t2p-4-2" source="Compute_2" target="resource_c0"/>
+      <arc id="t2p-3-2" source="Compute_2" target="state_c3"/>
+      <transition id="ComputeFirst_3">
+        <name>
+          <text>ComputeFirst_3</text>
+        </name>
+      </transition>
+      <arc id="p2t-3-8" source="capacity_c0" target="ComputeFirst_3"/>
+      <arc id="p2t-3-0" source="state_c0" target="ComputeFirst_3"/>
+      <arc id="t2p-5-3" source="ComputeFirst_3" target="resource_c1"/>
+      <arc id="t2p-0-3" source="ComputeFirst_3" target="state_c0"/>
+      <transition id="Exit_4">
+        <name>
+          <text>Exit_4</text>
+        </name>
+      </transition>
+      <arc id="p2t-4-3" source="state_c3" target="Exit_4"/>
+      <transition id="Go_5">
+        <name>
+          <text>Go_5</text>
+        </name>
+      </transition>
+      <arc id="p2t-5-0" source="state_c0" target="Go_5"/>
+      <arc id="t2p-1-5" source="Go_5" target="state_c1"/>
+      <transition id="Go_6">
+        <name>
+          <text>Go_6</text>
+        </name>
+      </transition>
+      <arc id="p2t-6-1" source="state_c1" target="Go_6"/>
+      <arc id="t2p-2-6" source="Go_6" target="state_c2"/>
+      <transition id="Go_7">
+        <name>
+          <text>Go_7</text>
+        </name>
+      </transition>
+      <arc id="p2t-7-2" source="state_c2" target="Go_7"/>
+      <arc id="t2p-3-7" source="Go_7" target="state_c3"/>
+      <transition id="Transfer_8">
+        <name>
+          <text>Transfer_8</text>
+        </name>
+      </transition>
+      <arc id="p2t-8-8" source="capacity_c0" target="Transfer_8"/>
+      <arc id="t2p-9-8" source="Transfer_8" target="capacity_c1"/>
+      <transition id="Transfer_9">
+        <name>
+          <text>Transfer_9</text>
+        </name>
+      </transition>
+      <arc id="p2t-9-9" source="capacity_c1" target="Transfer_9"/>
+      <arc id="t2p-10-9" source="Transfer_9" target="capacity_c2"/>
+      <transition id="Transfer_10">
+        <name>
+          <text>Transfer_10</text>
+        </name>
+      </transition>
+      <arc id="p2t-10-10" source="capacity_c2" target="Transfer_10"/>
+      <arc id="t2p-11-10" source="Transfer_10" target="capacity_c3"/>
+      <transition id="Transfer_11">
+        <name>
+          <text>Transfer_11</text>
+        </name>
+      </transition>
+      <arc id="p2t-11-11" source="capacity_c3" target="Transfer_11"/>
+      <arc id="t2p-8-11" source="Transfer_11" target="capacity_c0"/>
+    </page>
+  </net>
+</pnml>

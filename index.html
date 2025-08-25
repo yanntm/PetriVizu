@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petri Net Application</title>
+    <script type="module" src="js/bundle.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="top-bar">
+        <div class="tab-menu">
+            <button class="tab-button" data-tab="viewer">Viewer</button>
+            <button class="tab-button" data-tab="editor">Editor</button>
+            <button class="tab-button" data-tab="simulation">Simulation</button>
+            <button class="tab-button" data-tab="analysis">Analysis</button>
+        </div>
+        <div id="layout-tools">
+            <button id="fit-button" title="Fit the graph to view">Fit</button>
+            <select id="layout-dropdown" title="Select a layout"></select>
+            <button id="apply-layout-button" title="Apply the selected layout">Apply Layout</button>
+        </div>
+    </div>
+    <div id="viewer" class="tab-content" style="display: block;">
+        <div id="viewer-menu">
+            <button id="fileOpen">File -> Open</button>
+            <input type="file" id="fileInput" accept=".pnml" style="display: none;">
+            <button id="fileExport">File -> Export</button>
+            <select id="exampleSelect">
+                <option value="">Select Example</option>
+            </select>
+        </div>
+        <div id="viewer-cy"></div>
+    </div>
+    <div id="editor" class="tab-content" style="display:none;">
+        <div id="palette">
+            <button id="selectMove" title="Select/Move Tool">🖐️</button>
+            <button id="addPlace" title="Add Place">🔵</button>
+            <button id="addTransition" title="Add Transition">⬛</button>
+            <button id="addArc" title="Add Arc">➡</button>
+            <button id="editText" title="Edit Text">abc...</button>
+            <button id="delete" title="Delete Tool">❌</button>
+        </div>
+        <div id="editor-cy"></div>
+    </div>
+    <div id="simulation" class="tab-content" style="display:none;">
+        <div id="simulation-controls">
+            <button id="reset" title="Reset Simulation">🔄 Reset</button>
+            <div id="enabled-transitions" title="Enabled Transitions">Enabled Transitions:</div>
+            <div id="current-state-wrapper" title="Current State">
+                <textarea id="current-state" readonly></textarea>
+            </div>
+            <div id="trace" title="Trace">Trace:</div>
+        </div>
+        <div id="simulation-visualization-container">
+            <div id="simulation-cy-container">
+                <div id="simulation-cy"></div>
+            </div>
+            <div id="state-graph-cy-container">
+                <div id="state-graph-cy"></div>
+            </div>
+        </div>
+    </div>
+    <div id="analysis" class="tab-content" style="display:none;">
+        <div id="analysis-controls">
+            <div class="control-line">
+                <label for="examination-selector">Select Examination:</label>
+                <select id="examination-selector"></select>
+    
+                <label for="tool-selector">Select Tool:</label>
+                <select id="tool-selector"></select>
+    
+                <label for="apply-reductions">Apply Reductions:</label>
+                <input type="checkbox" id="apply-reductions">
+    
+                <label for="timeout">Timeout (seconds):</label>
+                <input type="number" id="timeout" value="100">
+            </div>
+            <div class="control-line">
+              <div class="vertical-container">
+                      <label for="formula-editor">Formula:</label>
+                      <button id="helpButton">Syntax Help</button>
+                  </div>
+                <div id="formula-editor" class="formula-editor"></div>
+                <button id="run-analysis" title="Run" class="run-button">Run</button>
+            </div>
+        </div>
+        
+        <div id="output-wrapper" title="Output">
+            <h3>Results</h3>
+            <div id="results"></div>
+            <h3>Standard Output (stdout)</h3>
+            <textarea id="stdout" readonly></textarea>
+            <h3>Error Output (stderr)</h3>
+            <textarea id="stderr" readonly></textarea>
+        </div>
+    </div>
+
+    <div id="property" class="tab-content" style="display:none;"> <!-- New Property tab content -->
+        <div id="property-controls">
+          <button id="save-property" title="Save Property">Save Property</button>
+            <button id="add-property" title="Add Property">Add Property</button>
+            <button id="remove-property" title="Remove Property">Remove Property</button>
+        </div>
+        <div id="property-list">
+            <!-- List of properties will be shown here -->
+        </div>
+        <div id="property-configuration" style="display:none;">
+            <!-- Property configuration form will be shown here -->
+        </div>
+        <div id="property-result" style="display:none;">
+            <h3>Standard Output (stdout)</h3>
+            <textarea id="property-stdout" readonly></textarea>
+            <h3>Error Output (stderr)</h3>
+            <textarea id="property-stderr" readonly></textarea>
+        </div>
+    </div>
+
+
+</body>
+</html>
